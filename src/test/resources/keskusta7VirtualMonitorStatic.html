@@ -1,0 +1,295 @@
+
+<?xml version='1.0' encoding='UTF-8'?>                              
+  <!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN'          
+ 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>               
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'> 
+  <head>                                                            
+    <title></title>                        
+    <meta http-equiv='Refresh' content='60; url=?lcn=Keskusta%2320945.10347%7CJyv%C3%A4skyl%C3%A4%20Keskusta%207&amp;ua=monitor&amp;v=monitor&amp;cl=0&amp;nocount=1' />
+    <link rel='stylesheet' type='text/css' href='styles/trt_style_vm.css' />
+    <link rel='stylesheet' type='text/css' href='custom/jkl/custom_style_vm.css' />
+
+   <script type="text/javascript" language="JavaScript">
+   <!--
+
+    var IE = document.all ? true : false;
+    if (!IE) window.captureEvents(Event.CLICK);
+    
+    function setfocus() {
+      if (document.getElementById('key')) {
+        document.search.key.focus();
+      } else if (document.getElementById('email')) {
+        document.feedback_form.email.focus();
+      }
+    }
+    
+    /* Function for showing notice details */
+    function show_notice(sID, e) {
+      var posx = 0;
+      var posy = 0;
+      if (!e) {
+        var e = window.event;
+      }
+      if (e.pageX || e.pageY) {
+        posx = e.pageX;
+        posy = e.pageY;
+      } else if (e.clientX || e.clientY) {
+        posx = e.clientX + document.body.scrollLeft;
+        posy = e.clientY + document.body.scrollTop;
+      } else {
+        posx = e.pageX;
+        posy = e.pageY;
+      }
+      temp_Obj = attach(sID);
+      temp_Obj.style.position   = "absolute";
+      temp_Obj.style.left       = posx + "px";
+      temp_Obj.style.top        = posy + "px";
+      temp_Obj.style.display    = "block";
+      temp_Obj.style.visibility = "visible";
+      temp_Obj.style.zIndex     = 10;
+      
+    }
+
+    /* Function for showing stop names on map (onmouseover) */
+    function show_stopname(sID, offset_x, offset_y, e) {
+      var posx = 0;
+      var posy = 0;
+      if (!e) {
+        var e = window.event;
+      }
+      if (e.pageX || e.pageY) {
+        posx = e.pageX + offset_x;
+        posy = e.pageY + offset_y;
+      } else if (e.clientX || e.clientY) {
+        posx = e.clientX + document.body.scrollLeft + offset_x;
+        posy = e.clientY + document.body.scrollTop + offset_y;
+      } else {
+        posx = e.pageX + offset_x;
+        posy = e.pageY + offset_y;
+      }
+      temp_Obj = attach(sID);
+      temp_Obj.style.position   = "absolute";
+      temp_Obj.style.left       = posx + "px";
+      temp_Obj.style.top        = posy + "px";
+      temp_Obj.style.display    = "block";
+      temp_Obj.style.visibility = "visible";
+      temp_Obj.style.zIndex     = 10;
+      
+    }
+    
+    /* Function for hiding and showing objects */
+    function toggleVis(sID, iVis) {
+      var obj = attach(sID);
+      if(document.layers) { //NN4+
+        obj.display    = iVis ? "block" : "none";
+        obj.visibility = iVis ? "show" : "hide";
+        obj.zIndex     = iVis ? "10" : "0";
+      } else { //Others
+        obj.style.display    = iVis ? "block" : "none";
+        obj.style.visibility = iVis ? "visible" : "hidden";
+        obj.style.zIndex     = iVis ? "10" : "0";
+      }
+    }
+    
+    function toggle_visibility(element, toggle, offset_x, offset_y, offset_relative, event) {
+      var obj = attach(element);
+      if (!event) var event = window.event;
+          
+      if (offset_relative) { // if the offset-params are relative to the event
+        //alert("event coords "+event.pageX+", "+event.pageY+" offset "+offset_x+", "+offset_y);
+        //offset_x =- 90;
+        //offset_y =- 30;
+        if (event.pageX || event.pageY) {
+          posx = event.pageX + offset_x;
+          posy = event.pageY + offset_y;
+        } else if (event.clientX || event.clientY) {
+          posx = event.clientX + document.body.scrollLeft + offset_x;
+          posy = event.clientY + document.body.scrollTop + offset_y;
+        } else if (event.offsetX || event.offsetY) {
+          posx = event.offsetX + offset_x;
+          posy = event.offsetY + offset_y;
+        } else {
+          posx = event.pageX + offset_x;
+          posy = event.pageY + offset_y;
+        }
+      } else { // if the offset-params define the absolute position of the element
+        posx = offset_x;
+        posy = offset_y;
+      }
+                                                                                                          
+      if(document.layers) { //NN4+
+        obj.display    = toggle ? "block" : "none";
+        obj.visibility = toggle ? "show" : "hide";
+        obj.zIndex     = toggle ? "10" : "0";
+        obj.position   = "absolute";
+        obj.left       = toggle ? posx + "px" : "0px";
+        obj.top        = toggle ? posy + "px" : "0px";
+                                                                                                                                        
+      } else { //Others
+        obj.style.display    = toggle ? "block" : "none";
+        obj.style.visibility = toggle ? "visible" : "hidden";
+        obj.style.zIndex     = toggle ? "10" : "0";
+        obj.style.position   = "absolute";
+        obj.style.left       = toggle ? posx + "px" : "0px";
+        obj.style.top        = toggle ? posy + "px" : "0px";
+      }
+    }
+
+    setInterval('blink()', 1000);
+    function blink() {
+      var el;
+      var element_prefixes = new Array('blinker', 'time_blinker');
+      var element_classes = new Array(new Array('results time_yellow','results time_blue'), new Array('', 'time_blue'));
+      var element_prefix = '';
+      var class1 = '';
+      var class2 = '';
+      var do_break = false;
+      
+      for (j=0; j<element_prefixes.length; j++) {
+        element_prefix = element_prefixes[j];
+        class1 = element_classes[j][0];
+        class2 = element_classes[j][1];
+        do_break = false;
+        for (i=0; !do_break; i++) {
+          el=attach(element_prefix+i);
+          //attach('lines').innerHTML += element_prefix+i;
+          if (!el) do_break = true;
+          else {
+            //el.className=(el.className=='results time_yellow')?'results time_blue':'results time_yellow';
+            el.className=(el.className==class1)?class2:class1;
+            //else el.class=(el.style.visibility=='visible')?'hidden':'visible';
+          }
+        }
+      }
+    }
+                                                                                                                                                                    
+    /* Function that attaches a given object id to a corresponding object */
+    function attach(sID) {
+      var obj;
+      if(document.layers) { //NN4+
+        obj = document.layers[sID];
+      } else if(document.getElementById){
+        obj=document.getElementById(sID);
+      } else if(document.all) {
+        obj = document.all[sID];
+      }
+      return obj;
+    }
+    
+  //-->
+  </script>
+  </head>
+  <body onload='javascript:setfocus();'>
+    <div class='main_container'>
+  <div class='tkl_banner_image_left main_header'><a class='main_banner_link' href='?ua=home'>Jyv&auml;skyl&auml;n<br />paikallisliikenteen pys&auml;kit</a></div>  <img alt='' style='position:relative;left:-10px;' class='tkl_banner_image_right' src='custom/jkl/images/jkl_bussi.gif' />
+  <div class='tkl_banner_box' style=''>
+   <table class='arranger' style='width: 100%;'><tr><td style='text-align: left;'>     <div style='width:50%;display:inline;'>      <img alt='' class='logo_image' src='custom/jkl/images/jkl_logo.gif' />     </div>   </td>   <td style='text-align: right;'>     <div style='text-align:right;display:inline;width:50%;padding-right:20px;'>      <img alt='' class='logo_image' style='padding-right:20px;padding-top:10px;' src='custom/jkl/images/jkl_ka_logo.gif' />     </div>   </td></tr></table>  </div>  <div class='jkl_hr'>&nbsp;</div><!-- End tkl banner box -->
+  <div class='banner_links_box'>
+     <div class='banner_links_left'>        <a href='?ua=home'>Alkuun</a> | 
+        <a href='?lcn=Keskusta%2320945.10347%7CJyv%C3%A4skyl%C3%A4%20Keskusta%207&amp;cdate=14.1.2013&amp;ctime=17.26&amp;stime=201301141726&amp;v=pda'>Mobiiliversio</a> | 
+        <a href='?v=timetables'>Pys&auml;kkiaikataulut</a> | 
+        <a href='?v=vm_stops'>Virtuaalimonitori</a> | 
+        <a href='?ua=help'>Ohjeet</a></div>
+     <div class='banner_links_right'>
+        <a href='?lcn=Keskusta%2320945.10347%7CJyv%C3%A4skyl%C3%A4%20Keskusta%207&amp;cdate=14.1.2013&amp;ctime=17.26&amp;stime=201301141726&amp;ua=monitor&amp;v=monitor&amp;lang=en'>In English</a> | 
+        <a href='?lcn=Keskusta%2320945.10347%7CJyv%C3%A4skyl%C3%A4%20Keskusta%207&amp;cdate=14.1.2013&amp;ctime=17.26&amp;stime=201301141726&amp;ua=monitor&amp;v=monitor&amp;lang=fi'>Suomeksi</a></div>
+  </div> <!-- End banner box -->
+  <div class='main_header'><a href='?ua=home&amp;v=monitor' style='color:#cccccc;text-decoration:none;'></a></div>
+  <div class='result_box'>
+    <div class='results' style='float:left;font-family:arial;font-weight:bold;'>Jyväskylä Keskusta 7</div><div class='results' style='float:right;'>Klo 17.26</div>
+  <table class='arranger' style='clear:both;' cellspacing=0 cellpadding=0 width=100%>
+    <tr>
+      <td colspan=2><div class='result_colname_time'>Aika</div></td><td><div class='result_colname_line'>Linja</div></td><td><div class='result_colname_fromto'>M&auml;&auml;r&auml;np&auml;&auml;</div></td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>17.28 <img src='images/bm1_forecast_arrow.gif' />17.34</td><td class='results' style='color:#FFFFFF;'>27</td><td class='results_fromto'>&nbsp;&nbsp;Kauppatori - Mustalampi</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>17.25 <img src='images/bm1_forecast_arrow.gif' />17.35</td><td class='results' style='color:#FFFFFF;'>32</td><td class='results_fromto'>&nbsp;&nbsp;Palokka - Keskusta</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>17.34 </td><td class='results' style='color:#FFFFFF;'>3</td><td class='results_fromto'>&nbsp;&nbsp;Tammirinne - Kirjasto</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>17.40 </td><td class='results' style='color:#FFFFFF;'>19</td><td class='results_fromto'>&nbsp;&nbsp;Keskusta - Keskussairaala</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>17.40 </td><td class='results' style='color:#FFFFFF;'>12</td><td class='results_fromto'>&nbsp;&nbsp;Keskusta - Keltinmäki</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>17.40 </td><td class='results' style='color:#FFFFFF;'>1</td><td class='results_fromto'>&nbsp;&nbsp;Keskusta - Kortemäki</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>17.48 </td><td class='results' style='color:#FFFFFF;'>27</td><td class='results_fromto'>&nbsp;&nbsp;Kauppatori - Mustalampi</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>18.00 </td><td class='results' style='color:#FFFFFF;'>12</td><td class='results_fromto'>&nbsp;&nbsp;Keskusta - Myllyjärvi</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>18.00 </td><td class='results' style='color:#FFFFFF;'>1</td><td class='results_fromto'>&nbsp;&nbsp;Keskusta - Kortemäki</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>18.05 </td><td class='results' style='color:#FFFFFF;'>3</td><td class='results_fromto'>&nbsp;&nbsp;Tammirinne - Kirjasto</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>18.08 </td><td class='results' style='color:#FFFFFF;'>27</td><td class='results_fromto'>&nbsp;&nbsp;Kauppatori - Mustalampi</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>17.55 <img src='images/bm1_forecast_arrow.gif' />18.09</td><td class='results' style='color:#FFFFFF;'>41</td><td class='results_fromto'>&nbsp;&nbsp;Keskusta - Keskussairaala</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>18.20 </td><td class='results' style='color:#FFFFFF;'>2</td><td class='results_fromto'>&nbsp;&nbsp;Keskusta - Kortemäki</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>18.28 </td><td class='results' style='color:#FFFFFF;'>27</td><td class='results_fromto'>&nbsp;&nbsp;Kauppatori - Mustalampi</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>18.30 </td><td class='results' style='color:#FFFFFF;'>12</td><td class='results_fromto'>&nbsp;&nbsp;Keskusta - Myllyjärvi</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>18.40 </td><td class='results' style='color:#FFFFFF;'>1</td><td class='results_fromto'>&nbsp;&nbsp;Keskusta - Kortemäki</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>18.48 </td><td class='results' style='color:#FFFFFF;'>27</td><td class='results_fromto'>&nbsp;&nbsp;Kauppatori - Mustalampi</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>19.00 </td><td class='results' style='color:#FFFFFF;'>1</td><td class='results_fromto'>&nbsp;&nbsp;Keskusta - Kortemäki</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>19.00 </td><td class='results' style='color:#FFFFFF;'>12</td><td class='results_fromto'>&nbsp;&nbsp;Keskusta - Myllyjärvi</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>19.05 </td><td class='results' style='color:#FFFFFF;'>3</td><td class='results_fromto'>&nbsp;&nbsp;Tammirinne - Kirjasto</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>19.07 </td><td class='results' style='color:#FFFFFF;'>27</td><td class='results_fromto'>&nbsp;&nbsp;Kauppatori - Mustalampi</td>
+    </tr>
+    <tr>
+      <td class='results time_yellow' align='left' nowrap='nowrap'></td><td class='results' align='left' nowrap='nowrap'>19.20 </td><td class='results' style='color:#FFFFFF;'>2</td><td class='results_fromto'>&nbsp;&nbsp;Keskusta - Kortemäki</td>
+    </tr>
+  </table><!-- End result arranger table -->
+</div><!-- End result box -->
+
+<!--
+Sitetracker check
+All OK!
+
+-->
+<div class='jkl_helper_footer'>&nbsp;</div></div><!-- End main container -->
+<div class='powered_by'>Powered by Logica</div>
+
+    <!-- Start of StatCounter Code --> 
+    <script type="text/javascript"> 
+    <!--  
+    var sc_project=1963987;  
+    var sc_invisible=1;  
+    var sc_partition=17;  
+    var sc_security="32b31045";  
+    //--> 
+    </script>
+
+    <script type="text/javascript" src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div class="statcounter"><a class="statcounter" href="http://www.statcounter.com/"><img class="statcounter" src="http://c11.statcounter.com/counter.php?sc_project=1125616&amp;java=0&amp;security=2ee01afe&amp;invisible=1" alt="website page counter" /></a></div></noscript>
+
+    <!-- End of StatCounter Code -->
+    <!-- GUI host was venus --></body>
+</html>

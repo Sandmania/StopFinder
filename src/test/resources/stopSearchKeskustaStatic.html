@@ -1,0 +1,946 @@
+<?xml version='1.0' encoding='UTF-8'?>                              
+  <!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN'          
+ 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>               
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'> 
+  <head>                                                            
+    <title></title>                        
+    <link rel='stylesheet' type='text/css' href='styles/trt_style.css' />
+    <link rel='stylesheet' type='text/css' href='custom/jkl/custom_style_vmstops.css' />
+
+   <script type="text/javascript" language="JavaScript">
+   <!--
+
+    var IE = document.all ? true : false;
+    if (!IE) window.captureEvents(Event.CLICK);
+    
+    function setfocus() {
+      if (document.getElementById('key')) {
+        document.search.key.focus();
+      } else if (document.getElementById('email')) {
+        document.feedback_form.email.focus();
+      }
+    }
+    
+    /* Function for showing notice details */
+    function show_notice(sID, e) {
+      var posx = 0;
+      var posy = 0;
+      if (!e) {
+        var e = window.event;
+      }
+      if (e.pageX || e.pageY) {
+        posx = e.pageX;
+        posy = e.pageY;
+      } else if (e.clientX || e.clientY) {
+        posx = e.clientX + document.body.scrollLeft;
+        posy = e.clientY + document.body.scrollTop;
+      } else {
+        posx = e.pageX;
+        posy = e.pageY;
+      }
+      temp_Obj = attach(sID);
+      temp_Obj.style.position   = "absolute";
+      temp_Obj.style.left       = posx + "px";
+      temp_Obj.style.top        = posy + "px";
+      temp_Obj.style.display    = "block";
+      temp_Obj.style.visibility = "visible";
+      temp_Obj.style.zIndex     = 10;
+      
+    }
+
+    /* Function for showing stop names on map (onmouseover) */
+    function show_stopname(sID, offset_x, offset_y, e) {
+      var posx = 0;
+      var posy = 0;
+      if (!e) {
+        var e = window.event;
+      }
+      if (e.pageX || e.pageY) {
+        posx = e.pageX + offset_x;
+        posy = e.pageY + offset_y;
+      } else if (e.clientX || e.clientY) {
+        posx = e.clientX + document.body.scrollLeft + offset_x;
+        posy = e.clientY + document.body.scrollTop + offset_y;
+      } else {
+        posx = e.pageX + offset_x;
+        posy = e.pageY + offset_y;
+      }
+      temp_Obj = attach(sID);
+      temp_Obj.style.position   = "absolute";
+      temp_Obj.style.left       = posx + "px";
+      temp_Obj.style.top        = posy + "px";
+      temp_Obj.style.display    = "block";
+      temp_Obj.style.visibility = "visible";
+      temp_Obj.style.zIndex     = 10;
+      
+    }
+    
+    /* Function for hiding and showing objects */
+    function toggleVis(sID, iVis) {
+      var obj = attach(sID);
+      if(document.layers) { //NN4+
+        obj.display    = iVis ? "block" : "none";
+        obj.visibility = iVis ? "show" : "hide";
+        obj.zIndex     = iVis ? "10" : "0";
+      } else { //Others
+        obj.style.display    = iVis ? "block" : "none";
+        obj.style.visibility = iVis ? "visible" : "hidden";
+        obj.style.zIndex     = iVis ? "10" : "0";
+      }
+    }
+    
+    function toggle_visibility(element, toggle, offset_x, offset_y, offset_relative, event) {
+      var obj = attach(element);
+      if (!event) var event = window.event;
+          
+      if (offset_relative) { // if the offset-params are relative to the event
+        //alert("event coords "+event.pageX+", "+event.pageY+" offset "+offset_x+", "+offset_y);
+        //offset_x =- 90;
+        //offset_y =- 30;
+        if (event.pageX || event.pageY) {
+          posx = event.pageX + offset_x;
+          posy = event.pageY + offset_y;
+        } else if (event.clientX || event.clientY) {
+          posx = event.clientX + document.body.scrollLeft + offset_x;
+          posy = event.clientY + document.body.scrollTop + offset_y;
+        } else if (event.offsetX || event.offsetY) {
+          posx = event.offsetX + offset_x;
+          posy = event.offsetY + offset_y;
+        } else {
+          posx = event.pageX + offset_x;
+          posy = event.pageY + offset_y;
+        }
+      } else { // if the offset-params define the absolute position of the element
+        posx = offset_x;
+        posy = offset_y;
+      }
+                                                                                                          
+      if(document.layers) { //NN4+
+        obj.display    = toggle ? "block" : "none";
+        obj.visibility = toggle ? "show" : "hide";
+        obj.zIndex     = toggle ? "10" : "0";
+        obj.position   = "absolute";
+        obj.left       = toggle ? posx + "px" : "0px";
+        obj.top        = toggle ? posy + "px" : "0px";
+                                                                                                                                        
+      } else { //Others
+        obj.style.display    = toggle ? "block" : "none";
+        obj.style.visibility = toggle ? "visible" : "hidden";
+        obj.style.zIndex     = toggle ? "10" : "0";
+        obj.style.position   = "absolute";
+        obj.style.left       = toggle ? posx + "px" : "0px";
+        obj.style.top        = toggle ? posy + "px" : "0px";
+      }
+    }
+
+    setInterval('blink()', 1000);
+    function blink() {
+      var el;
+      var element_prefixes = new Array('blinker', 'time_blinker');
+      var element_classes = new Array(new Array('results time_yellow','results time_blue'), new Array('', 'time_blue'));
+      var element_prefix = '';
+      var class1 = '';
+      var class2 = '';
+      var do_break = false;
+      
+      for (j=0; j<element_prefixes.length; j++) {
+        element_prefix = element_prefixes[j];
+        class1 = element_classes[j][0];
+        class2 = element_classes[j][1];
+        do_break = false;
+        for (i=0; !do_break; i++) {
+          el=attach(element_prefix+i);
+          //attach('lines').innerHTML += element_prefix+i;
+          if (!el) do_break = true;
+          else {
+            //el.className=(el.className=='results time_yellow')?'results time_blue':'results time_yellow';
+            el.className=(el.className==class1)?class2:class1;
+            //else el.class=(el.style.visibility=='visible')?'hidden':'visible';
+          }
+        }
+      }
+    }
+                                                                                                                                                                    
+    /* Function that attaches a given object id to a corresponding object */
+    function attach(sID) {
+      var obj;
+      if(document.layers) { //NN4+
+        obj = document.layers[sID];
+      } else if(document.getElementById){
+        obj=document.getElementById(sID);
+      } else if(document.all) {
+        obj = document.all[sID];
+      }
+      return obj;
+    }
+    
+  //-->
+  </script>
+  </head>
+  <body onload='javascript:setfocus();'>
+    <div class='main_container'>
+  <div class='tkl_banner_image_left main_header'><a class='main_banner_link' href='?ua=home'>Jyv&auml;skyl&auml;n<br />paikallisliikenteen pys&auml;kit</a></div>  <img alt='' style='position:relative;left:-10px;' class='tkl_banner_image_right' src='custom/jkl/images/jkl_bussi.gif' />
+  <div class='tkl_banner_box' style=''>
+   <table class='arranger' style='width: 100%;'><tr><td style='text-align: left;'>     <div style='width:50%;display:inline;'>      <img alt='' class='logo_image' src='custom/jkl/images/jkl_logo.gif' />     </div>   </td>   <td style='text-align: right;'>     <div style='text-align:right;display:inline;width:50%;padding-right:20px;'>      <img alt='' class='logo_image' style='padding-right:20px;padding-top:10px;' src='custom/jkl/images/jkl_ka_logo.gif' />     </div>   </td></tr></table>  </div>  <div class='jkl_hr'>&nbsp;</div><!-- End tkl banner box -->
+  <div class='banner_links_box'>
+     <div class='banner_links_left'>        <a href='?ua=home'>Alkuun</a> | 
+        <a href='?key=keskusta&amp;cdate=19.1.2013&amp;ctime=13.53&amp;stime=201301191353&amp;v=pda'>Mobiiliversio</a> | 
+        <a href='?v=timetables'>Pys&auml;kkiaikataulut</a> | 
+        <a href='?v=vm_stops'>Virtuaalimonitori</a> | 
+        <a href='?ua=help'>Ohjeet</a></div>
+     <div class='banner_links_right'>
+        <a href='?key=keskusta&amp;cdate=19.1.2013&amp;ctime=13.53&amp;stime=201301191353&amp;ua=search&amp;v=vm_stops&amp;lang=en'>In English</a> | 
+        <a href='?key=keskusta&amp;cdate=19.1.2013&amp;ctime=13.53&amp;stime=201301191353&amp;ua=search&amp;v=vm_stops&amp;lang=fi'>Suomeksi</a></div>
+  </div> <!-- End banner box -->
+  <div class='main_header'><a href='?ua=home&amp;v=vm_stops' style='color:#cccccc;text-decoration:none;'></a></div>
+<!-- start left column -->
+<div class='left_column'>
+<div class='search_box'>
+<div class='timetables_header'>Virtuaalimonitorin pys&auml;kkien valinta</div>
+ <div class='search_form'>
+   <form method='get' action='index.php?' name='search'>
+     <div class='search_title'>Haku</div>
+     <div class='timetable_search_element'><input type='text' id='key' name='key' size='25' /> <input class='submit_btn' type='submit' name='submit' value='Hae' /></div>
+
+<input type="hidden" name="ua" value="search" /><input type="hidden" name="v" value="vm_stops" />   </form>
+  <div class='timetable_help'>
+Esim. Kirjasto 1 tai Vapaudenkatu 5<br />T&auml;ll&auml; ty&ouml;kalulla voit valita useita pys&auml;kkej&auml; n&auml;ytett&auml;v&auml;ksi virtuaalimonitorissa.  </div>
+ </div>
+    <div class='search_title'>
+    Omat paikat
+    </div>
+      <div class='cookie_text'>Ei tallennettuja paikkoja.</div>
+  <div class='timetable_index_title'>Pys&auml;kkihakemisto</div>
+  <div class='timetable_index'>
+   <a href='?ua=search&amp;v=vm_stops&amp;key=A&amp;'>A</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=B&amp;'>B</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=C&amp;'>C</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=D&amp;'>D</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=E&amp;'>E</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=F&amp;'>F</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=G&amp;'>G</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=H&amp;'>H</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=I&amp;'>I</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=J&amp;'>J</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=K&amp;'>K</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=L&amp;'>L</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=M&amp;'>M</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=N&amp;'>N</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=O&amp;'>O</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=P&amp;'>P</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=Q&amp;'>Q</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=R&amp;'>R</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=S&amp;'>S</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=T&amp;'>T</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=U&amp;'>U</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=V&amp;'>V</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=W&amp;'>W</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=X&amp;'>X</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=Y&amp;'>Y</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=%C5&amp;'>≈</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=%C4&amp;'>ƒ</a>&nbsp;   <a href='?ua=search&amp;v=vm_stops&amp;key=%D6&amp;'>÷</a>&nbsp; </div>
+</div>      <div class='result_box' style='border: 1px solid #999'>
+        <div class='result_header'><b>Haun tulokset termille "keskusta"</b></div>
+        <table class='arranger' width='100%'>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Keskusta%2320945.10621&amp;name_list=Jyv%C3%A4skyl%C3%A4%20Keskusta%205&amp;key=keskusta'>
+                 Jyv√§skyl√§ Keskusta 5, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>21M</b> &raquo; Jaakkola, <b>16</b> &raquo; Muuratsalo, <b>21</b> &raquo; Jaakkola, <b>14</b> &raquo; Verkkoniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14</b> &raquo; Korpilahti, <b>13M</b> &raquo; Korpilahti, <b>14M</b> &raquo; Verkkoniemi, <b>16M</b> &raquo; Muuratsalo, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Keskusta, <b>16</b> &raquo; S√§yn√§tsalo, <b>16M</b> &raquo; S√§yn√§tsalo, <b>14</b> &raquo; Teollisuuskyl√§, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14M</b> &raquo; Muuramen teollisuuskyl√§, <b>14</b> &raquo; Niittyaho, <b>13M</b> &raquo; J√§ms√§nkoski
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Keskusta%2320945.10346&amp;name_list=Jyv%C3%A4skyl%C3%A4%20Keskusta%204&amp;key=keskusta'>
+                 Jyv√§skyl√§ Keskusta 4, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Kaunisharju, <b>2M</b> &raquo; Kaunisharju, <b>1</b> &raquo; Haapaniemi, <b>3</b> &raquo; Vaajakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>43</b> &raquo; Lievestuore, <b>6</b> &raquo; Matkakeskus, <b>3</b> &raquo; Asmalampi, <b>2</b> &raquo; Vaajakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>1M</b> &raquo; Haapaniemi, <b>38</b> &raquo; Ilmoniemi, <b>4</b> &raquo; V√§in√∂l√§, <b>43</b> &raquo; Hankasalmi kk, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Nojosniemi, <b>2</b> &raquo; Asmalampi-Kaunisharju, <b>42</b> &raquo; Vuontee--Lievestuore
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Keskusta%2320945.10456&amp;name_list=Jyv%C3%A4skyl%C3%A4%20Keskusta%206&amp;key=keskusta'>
+                 Jyv√§skyl√§ Keskusta 6, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>8</b> &raquo; Nen√§inniemi, <b>33</b> &raquo; Keskusta, <b>25K</b> &raquo; Palokankeskus, <b>20</b> &raquo; Kuokkala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>25</b> &raquo; Laajavuori, <b>18K</b> &raquo; Keskusta, <b>18K</b> &raquo; Kortepohja, <b>22</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22</b> &raquo; Viherlandia, <b>33</b> &raquo; Kuokkala, <b>5</b> &raquo; Ylist√∂nm√§ki, <b>25</b> &raquo; Haukkala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>15</b> &raquo; Viherlandia, <b>18</b> &raquo; Kortepohja, <b>18</b> &raquo; Keskusta, <b>2/25</b> &raquo; Kortem√§ki th, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>15K</b> &raquo; Viherlandia, <b>37</b> &raquo; Ruoke-Nuutti, <b>39</b> &raquo; Kuohu, <b>26</b> &raquo; Ylist√∂nm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>26</b> &raquo; Keskusta, <b>15</b> &raquo; Viherlaakso, <b>25</b> &raquo; Keskusta, <b>4</b> &raquo; V√§in√∂l√§
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Keskusta%2320945.10509&amp;name_list=Jyv%C3%A4skyl%C3%A4%20Keskusta%203&amp;key=keskusta'>
+                 Jyv√§skyl√§ Keskusta 3, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>25</b> &raquo; Kaakkolampi, <b>41</b> &raquo; √Ñ√§nekoski, <b>12</b> &raquo; Kangaslampi, <b>20</b> &raquo; Pupuhuhta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>25K</b> &raquo; Kaakkolampi, <b>41</b> &raquo; Peurunka-√Ñ√§nekoski, <b>13</b> &raquo; Kauppatori, <b>41</b> &raquo; Laukaa-Peurunka, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Laukaa-√Ñ√§nekoski, <b>41</b> &raquo; Vihtavuori, <b>12K</b> &raquo; Kauppatori (Palokangas), <b>40</b> &raquo; √Ñ√§nekoski-Suolahti, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Kaakkolampi, <b>10</b> &raquo; Kangaslampi, <b>12K</b> &raquo; Kangaslampi, <b>41</b> &raquo; Keskussairaala ¬ñ Keskusta ¬ñ Laukaa¬ñPeurunka, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>13</b> &raquo; Viitaniemi, <b>12K</b> &raquo; Palokangas, <b>10</b> &raquo; Keskusta, <b>20</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>1312K</b> &raquo; Kauppatori, <b>40</b> &raquo; Suolahti
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Keskusta%2320945.11001&amp;name_list=Jyv%C3%A4skyl%C3%A4%20Keskusta%202&amp;key=keskusta'>
+                 Jyv√§skyl√§ Keskusta 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Heikkil√§, <b>33</b> &raquo; Kirri, <b>36</b> &raquo; Tikkakoski, <b>22</b> &raquo; Tikkakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22M</b> &raquo; Tikkakoski, <b>27</b> &raquo; Keskusta, <b>32</b> &raquo; Vertaala, <b>22</b> &raquo; L√§nsiranta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>26</b> &raquo; Hein√§lampi, <b>35</b> &raquo; Haukkam√§ki, <b>12K</b> &raquo; Keskusta, <b>28</b> &raquo; Tikkakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22</b> &raquo; Keskusta, <b>37</b> &raquo; Nuutti-Ruoke, <b>36K</b> &raquo; L√§nsiranta, <b>36</b> &raquo; L√§nsiranta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>26</b> &raquo; Jylh√§, <b>34</b> &raquo; Jylh√§, <b>13</b> &raquo; Kauppatori, <b>31</b> &raquo; Vertaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>27/28</b> &raquo; Tikkakoski
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Keskusta%2320945.10347&amp;name_list=Jyv%C3%A4skyl%C3%A4%20Keskusta%207&amp;key=keskusta'>
+                 Jyv√§skyl√§ Keskusta 7, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>36/27</b> &raquo; Mustalampi, <b>35</b> &raquo; Keskussairaala, <b>34</b> &raquo; Keskusta, <b>35</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>1</b> &raquo; Kortem√§ki, <b>2</b> &raquo; Kortem√§ki, <b>41</b> &raquo; Keskusta, <b>3</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>3</b> &raquo; Kirjasto, <b>41</b> &raquo; Keskussairaala, <b>12</b> &raquo; Myllyj√§rvi, <b>6</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>26</b> &raquo; Keskusta, <b>13</b> &raquo; Tikkala, <b>12</b> &raquo; Keltinm√§ki, <b>19</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2M</b> &raquo; Cygnaeuksen koulu, <b>2M</b> &raquo; Keskussairaala, <b>27</b> &raquo; Keltinm√§ki, <b>28</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>36</b> &raquo; Keskusta, <b>2</b> &raquo; Keskussairaala, <b>12K</b> &raquo; Yl√§myllyj√§rvi, <b>43</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12/13</b> &raquo; Muurame, <b>10</b> &raquo; Keskussairaala, <b>41</b> &raquo; Jyv√§skyl√§ Keskusta, <b>36K</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22M</b> &raquo; Keskussairaala, <b></b> &raquo; Lahjaharjun hautausmaa, <b>19</b> &raquo; Keskusta, <b>12</b> &raquo; Helokantie, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>40</b> &raquo; Jyv√§skyl√§, <b>2M</b> &raquo; Keskusta, <b>22M</b> &raquo; Keskusta, <b>43</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>40</b> &raquo; Keskussairaala, <b>12K</b> &raquo; Keskusta, <b>32</b> &raquo; Keskusta, <b>41</b> &raquo; Jyv√§skyl√§ keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>1M</b> &raquo; Cygnaeuksen koulu, <b>31</b> &raquo; Keskusta, <b>18</b> &raquo; Keskussairaala, <b>39</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>38</b> &raquo; Cygnaeuksen koulu, <b>12</b> &raquo; Keskussairaala, <b>41</b> &raquo; Jyv√§skyl√§ keskusta, <b>41</b> &raquo; Jyv√§skyl√§ Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>38K</b> &raquo; Keskusta, <b>10</b> &raquo; Helokantie, <b>27</b> &raquo; Keskusta, <b>10</b> &raquo; Keltinm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>38K</b> &raquo; Cygnaeuksen Koulu, <b></b> &raquo; T√∂lsk√§n th, <b>42</b> &raquo; Keskussairaala, <b>38</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12/27</b> &raquo; Mustalampi
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Keskusta%2320945.10457&amp;name_list=Jyv%C3%A4skyl%C3%A4%20Keskusta%201&amp;key=keskusta'>
+                 Jyv√§skyl√§ Keskusta 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>15K</b> &raquo; Keskussairaala, <b>18K</b> &raquo; Nen√§inniemi, <b>15</b> &raquo; Keskusta, <b>5</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Kirri, <b>18</b> &raquo; Ristikivi, <b>16</b> &raquo; Kauppatori, <b>16M</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>5</b> &raquo; Kauppatori, <b>16</b> &raquo; Keskussairaala, <b>21</b> &raquo; Kauppatori, <b>19</b> &raquo; Samulinniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Keskusta, <b>14</b> &raquo; Viitaniemi, <b>14</b> &raquo; Keskusta, <b>21M</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14M</b> &raquo; Kauppatori, <b>8</b> &raquo; Keskusta, <b>13M</b> &raquo; Kauppatori, <b>8</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>15</b> &raquo; Kauppatori, <b>14M</b> &raquo; Keskusta, <b>13M</b> &raquo; Jyv√§skyl√§ Kauppatori, <b>4</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14</b> &raquo; Kauppatori, <b>14M</b> &raquo; Viitaniemi, <b>14</b> &raquo; Tourula, <b>18</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; kauppatori, <b>18K</b> &raquo; Keskusta
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320842.10349&amp;name_list=Urhonkatu%201&amp;key=keskusta'>
+                 Urhonkatu 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>25K</b> &raquo; Palokankeskus, <b>18K</b> &raquo; Kortepohja, <b>25</b> &raquo; Haukkala, <b>1</b> &raquo; Kortem√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Kortem√§ki, <b>18</b> &raquo; Keskusta, <b>18K</b> &raquo; Keskusta, <b>20</b> &raquo; Kuokkala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>3</b> &raquo; Keskussairaala, <b>2/25</b> &raquo; Kortem√§ki th, <b>3</b> &raquo; Kirjasto, <b>25</b> &raquo; Laajavuori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>18</b> &raquo; Kortepohja, <b>19</b> &raquo; Keskussairaala, <b>2M</b> &raquo; Cygnaeuksen koulu, <b>2M</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>1</b> &raquo; Keskusta, <b>2</b> &raquo; Keskusta, <b>2</b> &raquo; Keskussairaala, <b>43</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14</b> &raquo; Korpilahti, <b>42</b> &raquo; Keskussairaala, <b>10</b> &raquo; Keskussairaala, <b>10</b> &raquo; Keltinm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>6</b> &raquo; Keskussairaala, <b>38</b> &raquo; Keskusta, <b>36K</b> &raquo; Keskusta, <b>18</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b></b> &raquo; Lahjaharjun hautausmaa, <b>19</b> &raquo; Keskusta, <b>2M</b> &raquo; Keskusta, <b>1</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>43</b> &raquo; Keskusta, <b>1M</b> &raquo; Cygnaeuksen koulu, <b>25</b> &raquo; Keskusta, <b>4</b> &raquo; V√§in√∂l√§, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>38</b> &raquo; Cygnaeuksen koulu, <b>1M</b> &raquo; Viitaniemi, <b>38K</b> &raquo; Keskusta, <b>10</b> &raquo; Helokantie, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>38K</b> &raquo; Cygnaeuksen Koulu, <b></b> &raquo; T√∂lsk√§n th
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320842.10348&amp;name_list=Urhonkatu%202&amp;key=keskusta'>
+                 Urhonkatu 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Kaunisharju, <b>2M</b> &raquo; Kaunisharju, <b>1</b> &raquo; Haapaniemi, <b>18</b> &raquo; Ristikivi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>15</b> &raquo; Keskusta, <b>19</b> &raquo; Samulinniemi, <b>25K</b> &raquo; Kaakkolampi, <b>3</b> &raquo; Vaajakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>25</b> &raquo; Kaakkolampi, <b>18K</b> &raquo; Nen√§inniemi, <b>20</b> &raquo; Pupuhuhta, <b>3</b> &raquo; Asmalampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>1M</b> &raquo; Haapaniemi, <b>6</b> &raquo; Matkakeskus, <b>10</b> &raquo; Kangaslampi, <b>4</b> &raquo; V√§in√∂l√§, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Kaakkolampi, <b>43</b> &raquo; Hankasalmi kk, <b>2</b> &raquo; Nojosniemi, <b>14</b> &raquo; Tourula, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>42</b> &raquo; Vuontee--Lievestuore, <b>43</b> &raquo; Lievestuore, <b>2</b> &raquo; Vaajakoski, <b>38</b> &raquo; Ilmoniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Asmalampi-Kaunisharju
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320901.10288&amp;name_list=Urhonkatu%203&amp;key=keskusta'>
+                 Urhonkatu 3, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>8</b> &raquo; Nen√§inniemi, <b>33</b> &raquo; Keskusta, <b>36/27</b> &raquo; Mustalampi, <b>21M</b> &raquo; Jaakkola, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Muuratsalo, <b>22</b> &raquo; Viherlandia, <b>35</b> &raquo; Keskussairaala, <b>34</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>35</b> &raquo; Keskusta, <b>5</b> &raquo; Ylist√∂nm√§ki, <b>22</b> &raquo; Keskusta, <b>21</b> &raquo; Jaakkola, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Keskusta, <b>41</b> &raquo; Keskussairaala, <b>12</b> &raquo; Myllyj√§rvi, <b>15K</b> &raquo; Viherlandia, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>26</b> &raquo; Keskusta, <b>13</b> &raquo; Tikkala, <b>14M</b> &raquo; Verkkoniemi, <b>12</b> &raquo; Keltinm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Keltinm√§ki, <b>37</b> &raquo; Ruoke-Nuutti, <b>28</b> &raquo; Keskusta, <b>36</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>13M</b> &raquo; Korpilahti, <b>12K</b> &raquo; Yl√§myllyj√§rvi, <b>33</b> &raquo; Kuokkala, <b>26</b> &raquo; Ylist√∂nm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12/13</b> &raquo; Muurame, <b>13M</b> &raquo; J√§ms√§nkoski, <b>12/27</b> &raquo; Mustalampi, <b>32</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Jyv√§skyl√§ Keskusta, <b>40</b> &raquo; Keskussairaala, <b>16</b> &raquo; Keskusta, <b>22M</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>15</b> &raquo; Viherlaakso, <b>16M</b> &raquo; S√§yn√§tsalo, <b>14</b> &raquo; Korpilahti, <b>12</b> &raquo; Helokantie, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14M</b> &raquo; Muuramen teollisuuskyl√§, <b>40</b> &raquo; Jyv√§skyl√§, <b>22M</b> &raquo; Keskusta, <b>16</b> &raquo; S√§yn√§tsalo, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12K</b> &raquo; Keskusta, <b>41</b> &raquo; Jyv√§skyl√§ keskussairaala, <b>31</b> &raquo; Keskusta, <b>39</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12</b> &raquo; Keskussairaala, <b>41</b> &raquo; Jyv√§skyl√§ keskusta, <b>41</b> &raquo; Jyv√§skyl√§ Keskussairaala, <b>16M</b> &raquo; Muuratsalo, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Keskusta, <b>14</b> &raquo; Verkkoniemi
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320901.15509&amp;name_list=V%C3%A4in%C3%B6nkatu%201&amp;key=keskusta'>
+                 V√§in√∂nkatu 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Keskussairaala
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Jyvras%232476.3582&amp;name_list=Jyv%C3%A4skyl%C3%A4%20Matkakeskus%20laituri%203&amp;key=keskusta'>
+                 Jyv√§skyl√§ Matkakeskus laituri 3, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Laukaa-√Ñ√§nekoski
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Jyvras%232476.2805&amp;name_list=Jyv%C3%A4skyl%C3%A4%20Matkakeskus%20laituri%201&amp;key=keskusta'>
+                 Jyv√§skyl√§ Matkakeskus laituri 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>6</b> &raquo; Keskussairaala, <b>6</b> &raquo; Matkakeskus
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Jyvras%232476.510&amp;name_list=Jyv%C3%A4skyl%C3%A4%20Matkakeskus%20laituri%204&amp;key=keskusta'>
+                 Jyv√§skyl√§ Matkakeskus laituri 4, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>43</b> &raquo; Lievestuore, <b>43</b> &raquo; Hankasalmi kk
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320901.17354&amp;name_list=V%C3%A4in%C3%B6nkatu%204&amp;key=keskusta'>
+                 V√§in√∂nkatu 4, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Kirri
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320901.10453&amp;name_list=Urhonkatu%204&amp;key=keskusta'>
+                 Urhonkatu 4, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Heikkil√§, <b>22</b> &raquo; Tikkakoski, <b>22M</b> &raquo; Tikkakoski, <b>12</b> &raquo; Kangaslampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>5</b> &raquo; Viitaniemi, <b>21</b> &raquo; Kauppatori, <b>5</b> &raquo; Kauppatori, <b>16</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>32</b> &raquo; Vertaala, <b>41</b> &raquo; Peurunka-√Ñ√§nekoski, <b>33</b> &raquo; Kirri, <b>41</b> &raquo; Laukaa-Peurunka, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>26</b> &raquo; Hein√§lampi, <b>28</b> &raquo; Tikkakoski, <b>22</b> &raquo; L√§nsiranta, <b>41</b> &raquo; Vihtavuori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14M</b> &raquo; Kauppatori, <b>41</b> &raquo; Laukaa-√Ñ√§nekoski, <b>16</b> &raquo; Kirri, <b>8</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12K</b> &raquo; Kauppatori, <b>15</b> &raquo; Kauppatori, <b>33</b> &raquo; Keskusta, <b>41</b> &raquo; √Ñ√§nekoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Keskussairaala, <b>40</b> &raquo; √Ñ√§nekoski-Suolahti, <b>13M</b> &raquo; Jyv√§skyl√§ Kauppatori, <b>14</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>13</b> &raquo; Kauppatori, <b>12K</b> &raquo; Palokangas, <b>13M</b> &raquo; Kauppatori, <b>21M</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>15K</b> &raquo; Keskussairaala, <b>35</b> &raquo; Haukkam√§ki, <b>36</b> &raquo; Tikkakoski, <b>36</b> &raquo; L√§nsiranta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16M</b> &raquo; Viitaniemi, <b>16</b> &raquo; kauppatori, <b>1312K</b> &raquo; Kauppatori, <b>27</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>37</b> &raquo; Nuutti-Ruoke, <b>12K</b> &raquo; Kangaslampi, <b>40</b> &raquo; Suolahti, <b>12K</b> &raquo; Kauppatori (Palokangas), <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14</b> &raquo; Viitaniemi, <b>36K</b> &raquo; L√§nsiranta, <b>26</b> &raquo; Jylh√§, <b>34</b> &raquo; Jylh√§, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Keskussairaala ¬ñ Keskusta ¬ñ Laukaa¬ñPeurunka, <b>13</b> &raquo; Viitaniemi, <b>31</b> &raquo; Vertaala, <b>1M</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>27/28</b> &raquo; Tikkakoski, <b>4</b> &raquo; Keskussairaala, <b>14M</b> &raquo; Viitaniemi
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320024.10508&amp;name_list=Jyv%C3%A4skyl%C3%A4%20Kauppatori%2010&amp;key=keskusta'>
+                 Jyv√§skyl√§ Kauppatori 10, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Keltinm√§ki, <b>27</b> &raquo; Heikkil√§, <b>36/27</b> &raquo; Mustalampi, <b>41</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>34</b> &raquo; Keskusta, <b>27</b> &raquo; Keskusta, <b>28</b> &raquo; Keskusta, <b>41</b> &raquo; Jyv√§skyl√§ keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Keskusta, <b>12K</b> &raquo; Keskusta, <b>36K</b> &raquo; Keskusta, <b>36</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>40</b> &raquo; Keskussairaala, <b>39</b> &raquo; Keskusta, <b>12K</b> &raquo; Yl√§myllyj√§rvi, <b>32</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12</b> &raquo; Keltinm√§ki, <b>12/13</b> &raquo; Muurame, <b>34</b> &raquo; Jylh√§, <b>12/27</b> &raquo; Mustalampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Jyv√§skyl√§ Keskusta, <b>41</b> &raquo; Jyv√§skyl√§ Keskussairaala, <b>40</b> &raquo; Jyv√§skyl√§, <b>27</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Jyv√§skyl√§ keskussairaala, <b>12</b> &raquo; Myllyj√§rvi
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320024.10565&amp;name_list=Jyv%C3%A4skyl%C3%A4%20Kauppatori%209&amp;key=keskusta'>
+                 Jyv√§skyl√§ Kauppatori 9, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>21</b> &raquo; Jaakkola, <b>16</b> &raquo; Keskusta, <b>16</b> &raquo; Muuratsalo, <b>13</b> &raquo; Muurame, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>21M</b> &raquo; Jaakkola, <b>13M</b> &raquo; J√§ms√§nkoski, <b>13M</b> &raquo; Korpilahti, <b>27</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14</b> &raquo; Korpilahti, <b>16M</b> &raquo; Muuratsalo, <b>14</b> &raquo; Verkkoniemi, <b>16</b> &raquo; S√§yn√§tsalo, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16M</b> &raquo; S√§yn√§tsalo, <b>13</b> &raquo; Tikkala, <b>14M</b> &raquo; Verkkoniemi
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320024.10455&amp;name_list=Jyv%C3%A4skyl%C3%A4%20Kauppatori%2011&amp;key=keskusta'>
+                 Jyv√§skyl√§ Kauppatori 11, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Keskussairaala, <b>15K</b> &raquo; Keskussairaala, <b>14</b> &raquo; Kauppatori, <b>5</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>5</b> &raquo; Kauppatori, <b>21</b> &raquo; Kauppatori, <b>16</b> &raquo; Kauppatori, <b>16M</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>21M</b> &raquo; Kauppatori, <b>13M</b> &raquo; Jyv√§skyl√§ Kauppatori, <b>14</b> &raquo; Viitaniemi, <b>13M</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>1M</b> &raquo; Viitaniemi, <b>4</b> &raquo; Keskussairaala, <b>15</b> &raquo; Kauppatori, <b>14M</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; kauppatori, <b>10</b> &raquo; Viitaniemi, <b>14M</b> &raquo; Viitaniemi
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320843.10458&amp;name_list=Kirjasto%201&amp;key=keskusta'>
+                 Kirjasto 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>8</b> &raquo; Nen√§inniemi, <b>20</b> &raquo; Kuokkala, <b>21M</b> &raquo; Jaakkola, <b>16</b> &raquo; Muuratsalo, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22</b> &raquo; Viherlandia, <b>14</b> &raquo; Verkkoniemi, <b>33</b> &raquo; Kuokkala, <b>5</b> &raquo; Ylist√∂nm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>15</b> &raquo; Viherlandia, <b>21</b> &raquo; Jaakkola, <b>13M</b> &raquo; Korpilahti, <b>16M</b> &raquo; Muuratsalo, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14M</b> &raquo; Verkkoniemi, <b>16</b> &raquo; S√§yn√§tsalo, <b>15K</b> &raquo; Viherlandia, <b>16M</b> &raquo; S√§yn√§tsalo, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>43</b> &raquo; Lievestuore, <b>14M</b> &raquo; Kauppatori, <b>4</b> &raquo; V√§in√∂l√§, <b>14</b> &raquo; Korpilahti, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>15</b> &raquo; Viherlaakso, <b>13M</b> &raquo; Kauppatori, <b>26</b> &raquo; Ylist√∂nm√§ki, <b>13M</b> &raquo; Jyv√§skyl√§ Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>43</b> &raquo; Hankasalmi kk, <b>14</b> &raquo; Teollisuuskyl√§, <b>14M</b> &raquo; Muuramen teollisuuskyl√§, <b>14</b> &raquo; Niittyaho
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320024.10507&amp;name_list=Jyv%C3%A4skyl%C3%A4%20Kauppatori%2012&amp;key=keskusta'>
+                 Jyv√§skyl√§ Kauppatori 12, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>36</b> &raquo; Tikkakoski, <b>22</b> &raquo; Tikkakoski, <b>27</b> &raquo; Heikkil√§, <b>16</b> &raquo; Kirri, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; √Ñ√§nekoski, <b>27</b> &raquo; Keskusta, <b>40</b> &raquo; Suolahti, <b>32</b> &raquo; Vertaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22</b> &raquo; L√§nsiranta, <b>41</b> &raquo; Peurunka-√Ñ√§nekoski, <b>13</b> &raquo; Kauppatori, <b>40</b> &raquo; √Ñ√§nekoski-Suolahti, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Laukaa-Peurunka, <b>8</b> &raquo; Viitaniemi, <b>26</b> &raquo; Hein√§lampi, <b>41</b> &raquo; Vihtavuori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>28</b> &raquo; Tikkakoski, <b>14M</b> &raquo; Kauppatori, <b>41</b> &raquo; Laukaa-√Ñ√§nekoski, <b>12K</b> &raquo; Kauppatori (Palokangas), <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>36K</b> &raquo; L√§nsiranta, <b>36</b> &raquo; L√§nsiranta, <b>26</b> &raquo; Jylh√§, <b>12K</b> &raquo; Kangaslampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Keskussairaala ¬ñ Keskusta ¬ñ Laukaa¬ñPeurunka, <b>14</b> &raquo; Kauppatori, <b>13</b> &raquo; Viitaniemi, <b>12K</b> &raquo; Palokangas, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>27/28</b> &raquo; Tikkakoski, <b>1312K</b> &raquo; Kauppatori, <b>13M</b> &raquo; Kauppatori
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320843.10345&amp;name_list=Kirjasto%202&amp;key=keskusta'>
+                 Kirjasto 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>36/27</b> &raquo; Mustalampi, <b>35</b> &raquo; Keskussairaala, <b>1</b> &raquo; Kortem√§ki, <b>2</b> &raquo; Kortem√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2/25</b> &raquo; Kortem√§ki th, <b>3</b> &raquo; Kirjasto, <b>41</b> &raquo; Keskussairaala, <b>12</b> &raquo; Myllyj√§rvi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>6</b> &raquo; Keskussairaala, <b>12</b> &raquo; Keltinm√§ki, <b>19</b> &raquo; Keskussairaala, <b>2M</b> &raquo; Cygnaeuksen koulu, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2M</b> &raquo; Keskussairaala, <b>27</b> &raquo; Keltinm√§ki, <b>40</b> &raquo; Keskussairaala, <b>2</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12K</b> &raquo; Yl√§myllyj√§rvi, <b>3</b> &raquo; Keskussairaala, <b>43</b> &raquo; Keskussairaala, <b>42</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Keskussairaala, <b>12/13</b> &raquo; Muurame, <b>13M</b> &raquo; J√§ms√§nkoski, <b>12/27</b> &raquo; Mustalampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22M</b> &raquo; Keskussairaala, <b></b> &raquo; Lahjaharjun hautausmaa, <b>12</b> &raquo; Helokantie, <b>12K</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Jyv√§skyl√§ keskussairaala, <b>1M</b> &raquo; Cygnaeuksen koulu, <b>13M</b> &raquo; Korpilahti, <b>12</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Jyv√§skyl√§ Keskussairaala, <b>10</b> &raquo; Helokantie, <b>10</b> &raquo; Keltinm√§ki, <b></b> &raquo; T√∂lsk√§n th
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320024.10454&amp;name_list=Jyv%C3%A4skyl%C3%A4%20Kauppatori%208&amp;key=keskusta'>
+                 Jyv√§skyl√§ Kauppatori 8, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>22</b> &raquo; Keskusta, <b>8</b> &raquo; Nen√§inniemi, <b>22</b> &raquo; Viherlandia, <b>5</b> &raquo; Ylist√∂nm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>15</b> &raquo; Viherlaakso, <b>26</b> &raquo; Ylist√∂nm√§ki, <b>26</b> &raquo; Keskusta, <b>15K</b> &raquo; Viherlandia, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>3</b> &raquo; Asmalampi, <b>4</b> &raquo; V√§in√∂l√§, <b>10</b> &raquo; Kaakkolampi
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Hannikai%232474.14238&amp;name_list=Maakuntakeskus&amp;key=keskusta'>
+                 Maakuntakeskus, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>13M</b> &raquo; Kauppatori
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320843.10566&amp;name_list=Kirjasto%203&amp;key=keskusta'>
+                 Kirjasto 3, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>25K</b> &raquo; Palokankeskus, <b>25</b> &raquo; Laajavuori, <b>18K</b> &raquo; Kortepohja, <b>3</b> &raquo; Kirjasto, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>25</b> &raquo; Haukkala, <b>18</b> &raquo; Kortepohja, <b>13</b> &raquo; Tikkala, <b>37</b> &raquo; Ruoke-Nuutti, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>39</b> &raquo; Kuohu, <b>18</b> &raquo; Keskussairaala, <b>13</b> &raquo; Muurame, <b>3</b> &raquo; Keskussairaala
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Puistkou%2321343.10962&amp;name_list=Puistokoulu%202&amp;key=keskusta'>
+                 Puistokoulu 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>12</b> &raquo; Kangaslampi, <b>33</b> &raquo; Kirri, <b>37</b> &raquo; Nuutti-Ruoke, <b>22M</b> &raquo; Tikkakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>35</b> &raquo; Haukkam√§ki, <b>22</b> &raquo; Tikkakoski, <b>33</b> &raquo; Keskusta, <b>31</b> &raquo; Vertaala
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Puistkou%2321343.10963&amp;name_list=Puistokoulu%201&amp;key=keskusta'>
+                 Puistokoulu 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Keskusta, <b>12</b> &raquo; Keltinm√§ki, <b>12</b> &raquo; Myllyj√§rvi, <b>35</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Kuokkala, <b>35</b> &raquo; Keskusta, <b>37</b> &raquo; Ruoke-Nuutti, <b>31</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22M</b> &raquo; Keskussairaala, <b>22</b> &raquo; Viherlandia, <b>34</b> &raquo; Keskusta, <b>22</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Kirri, <b>12</b> &raquo; Helokantie, <b>22M</b> &raquo; Keskusta, <b>12</b> &raquo; Keskussairaala
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320843.10344&amp;name_list=Kirjasto%206&amp;key=keskusta'>
+                 Kirjasto 6, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Kaunisharju, <b>2M</b> &raquo; Kaunisharju, <b>1</b> &raquo; Haapaniemi, <b>5</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>18</b> &raquo; Ristikivi, <b>5</b> &raquo; Viitaniemi, <b>15</b> &raquo; Keskusta, <b>21</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>19</b> &raquo; Samulinniemi, <b>25K</b> &raquo; Kaakkolampi, <b>3</b> &raquo; Vaajakoski, <b>5</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Kauppatori, <b>25</b> &raquo; Kaakkolampi, <b>18K</b> &raquo; Nen√§inniemi, <b>33</b> &raquo; Kirri, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>26</b> &raquo; Hein√§lampi, <b>22</b> &raquo; Keskusta, <b>14</b> &raquo; Keskusta, <b>6</b> &raquo; Matkakeskus, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>8</b> &raquo; Keskusta, <b>8</b> &raquo; Viitaniemi, <b>15</b> &raquo; Kauppatori, <b>10</b> &raquo; Kangaslampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14M</b> &raquo; Keskusta, <b>16</b> &raquo; Keskussairaala, <b>10</b> &raquo; Kaakkolampi, <b>14</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14M</b> &raquo; Viitaniemi, <b>16M</b> &raquo; Viitaniemi, <b>35</b> &raquo; Haukkam√§ki, <b>21M</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>15K</b> &raquo; Keskussairaala, <b>14</b> &raquo; Tourula, <b>42</b> &raquo; Vuontee--Lievestuore, <b>14M</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; kauppatori, <b>18</b> &raquo; Keskusta, <b>10</b> &raquo; Keskusta, <b>2</b> &raquo; Vaajakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14</b> &raquo; Viitaniemi, <b>1M</b> &raquo; Haapaniemi, <b>18K</b> &raquo; Keskusta, <b>2</b> &raquo; Asmalampi-Kaunisharju
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320843.10510&amp;name_list=Kirjasto%205&amp;key=keskusta'>
+                 Kirjasto 5, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Heikkil√§, <b>12</b> &raquo; Kangaslampi, <b>2</b> &raquo; Kaunisharju, <b>41</b> &raquo; Peurunka-√Ñ√§nekoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>25</b> &raquo; Kaakkolampi, <b>1</b> &raquo; Haapaniemi, <b>41</b> &raquo; Laukaa-Peurunka, <b>20</b> &raquo; Pupuhuhta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Keskusta, <b>12K</b> &raquo; Keskusta, <b>41</b> &raquo; Laukaa-√Ñ√§nekoski, <b>22</b> &raquo; Tikkakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Vihtavuori, <b>25K</b> &raquo; Kaakkolampi, <b>12K</b> &raquo; Kauppatori, <b>4</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>40</b> &raquo; √Ñ√§nekoski, <b>40</b> &raquo; √Ñ√§nekoski-Suolahti, <b>4</b> &raquo; Keskussairaala, <b>13</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22</b> &raquo; L√§nsiranta, <b>12K</b> &raquo; Kangaslampi, <b>13M</b> &raquo; Kauppatori, <b>2</b> &raquo; Nojosniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>20</b> &raquo; Keskusta, <b>1312K</b> &raquo; Kauppatori, <b>37</b> &raquo; Nuutti-Ruoke, <b>12K</b> &raquo; Kauppatori (Palokangas), <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Keskussairaala ¬ñ Keskusta ¬ñ Laukaa¬ñPeurunka, <b>22M</b> &raquo; Tikkakoski, <b>13</b> &raquo; Viitaniemi, <b>27/28</b> &raquo; Tikkakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; √Ñ√§nekoski
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Satama%2320844.10460&amp;name_list=Satama%201&amp;key=keskusta'>
+                 Satama 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>15K</b> &raquo; Keskussairaala, <b>33</b> &raquo; Kirri, <b>5</b> &raquo; Viitaniemi, <b>5</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>5</b> &raquo; Keskusta, <b>4</b> &raquo; Keskussairaala, <b>26</b> &raquo; Hein√§lampi, <b>4</b> &raquo; Keskusta
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Schaum%2321287.10833&amp;name_list=Schaumanin%20linna%202&amp;key=keskusta'>
+                 Schaumanin linna 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>18K</b> &raquo; Nen√§inniemi, <b>19</b> &raquo; Samulinniemi, <b>18</b> &raquo; Ristikivi
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Heikink%2321286.10831&amp;name_list=Heikinkatu%202&amp;key=keskusta'>
+                 Heikinkatu 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>18K</b> &raquo; Nen√§inniemi, <b>19</b> &raquo; Samulinniemi, <b>18</b> &raquo; Ristikivi
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Schaum%2321287.10834&amp;name_list=Schaumanin%20linna%201&amp;key=keskusta'>
+                 Schaumanin linna 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>19</b> &raquo; Keskussairaala, <b>18K</b> &raquo; Keskusta, <b>18K</b> &raquo; Kortepohja, <b>18</b> &raquo; Kortepohja, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>18</b> &raquo; Keskusta, <b>18</b> &raquo; Keskussairaala, <b>19</b> &raquo; Keskusta
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Messuk%2321288.10836&amp;name_list=Messukeskus%201&amp;key=keskusta'>
+                 Messukeskus 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>19</b> &raquo; Keskussairaala, <b>18K</b> &raquo; Keskusta, <b>18K</b> &raquo; Kortepohja, <b>18</b> &raquo; Kortepohja, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>18</b> &raquo; Keskusta, <b>18</b> &raquo; Keskussairaala, <b>19</b> &raquo; Keskusta
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Heikink%2321286.10832&amp;name_list=Heikinkatu%201&amp;key=keskusta'>
+                 Heikinkatu 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>19</b> &raquo; Keskussairaala, <b>18K</b> &raquo; Keskusta, <b>18K</b> &raquo; Kortepohja, <b>18</b> &raquo; Kortepohja, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>18</b> &raquo; Keskusta, <b>18</b> &raquo; Keskussairaala, <b>19</b> &raquo; Keskusta
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Messuk%2321288.10835&amp;name_list=Messukeskus%202&amp;key=keskusta'>
+                 Messukeskus 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>18K</b> &raquo; Nen√§inniemi, <b>19</b> &raquo; Samulinniemi, <b>18</b> &raquo; Ristikivi
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320841.10351&amp;name_list=Tourunsilta%202&amp;key=keskusta'>
+                 Tourunsilta 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Kaunisharju, <b>2M</b> &raquo; Kaunisharju, <b>1</b> &raquo; Haapaniemi, <b>25</b> &raquo; Kaakkolampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>3</b> &raquo; Vaajakoski, <b>15</b> &raquo; Keskusta, <b>20</b> &raquo; Pupuhuhta, <b>25K</b> &raquo; Kaakkolampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>3</b> &raquo; Asmalampi, <b>1M</b> &raquo; Haapaniemi, <b>10</b> &raquo; Kangaslampi, <b>4</b> &raquo; V√§in√∂l√§, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Kaakkolampi, <b>43</b> &raquo; Hankasalmi kk, <b>43</b> &raquo; Lievestuore, <b>14</b> &raquo; Tourula, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Nojosniemi, <b>2</b> &raquo; Asmalampi-Kaunisharju, <b>42</b> &raquo; Vuontee--Lievestuore, <b>38</b> &raquo; Ilmoniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Vaajakoski
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320841.10350&amp;name_list=Tourunsilta%201&amp;key=keskusta'>
+                 Tourunsilta 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>1</b> &raquo; Kortem√§ki, <b>10</b> &raquo; Helokantie, <b>25K</b> &raquo; Palokankeskus, <b>20</b> &raquo; Kuokkala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>25</b> &raquo; Laajavuori, <b>3</b> &raquo; Kirjasto, <b>25</b> &raquo; Haukkala, <b>2</b> &raquo; Kortem√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>1</b> &raquo; Keskusta, <b>3</b> &raquo; Keskussairaala, <b>2/25</b> &raquo; Kortem√§ki th, <b>10</b> &raquo; Keltinm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>1M</b> &raquo; Viitaniemi, <b></b> &raquo; T√∂lsk√§n th, <b>2M</b> &raquo; Cygnaeuksen koulu, <b>1</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2M</b> &raquo; Keskussairaala, <b>4</b> &raquo; Keskussairaala, <b>2</b> &raquo; Keskusta, <b>2</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>43</b> &raquo; Keskussairaala, <b>42</b> &raquo; Keskussairaala, <b>10</b> &raquo; Keskussairaala, <b>38</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b></b> &raquo; Lahjaharjun hautausmaa, <b>14M</b> &raquo; Muuramen teollisuuskyl√§, <b>2M</b> &raquo; Keskusta, <b>38K</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>43</b> &raquo; Keskusta, <b>1M</b> &raquo; Cygnaeuksen koulu, <b>25</b> &raquo; Keskusta, <b>38</b> &raquo; Cygnaeuksen koulu, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Viitaniemi
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=K-S%20talo%2321090.10506&amp;name_list=Keski-Suomen%20talo&amp;key=keskusta'>
+                 Keski-Suomen talo, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>15K</b> &raquo; Keskussairaala, <b>27</b> &raquo; Heikkil√§, <b>36</b> &raquo; Tikkakoski, <b>22</b> &raquo; Tikkakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>5</b> &raquo; Viitaniemi, <b>16</b> &raquo; Kirri, <b>41</b> &raquo; √Ñ√§nekoski, <b>16M</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Keskussairaala, <b>32</b> &raquo; Vertaala, <b>41</b> &raquo; Peurunka-√Ñ√§nekoski, <b>22</b> &raquo; L√§nsiranta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Laukaa-Peurunka, <b>26</b> &raquo; Hein√§lampi, <b>14</b> &raquo; Viitaniemi, <b>1M</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>28</b> &raquo; Tikkakoski, <b>41</b> &raquo; Laukaa-√Ñ√§nekoski, <b>41</b> &raquo; Vihtavuori, <b>4</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>8</b> &raquo; Viitaniemi, <b>12K</b> &raquo; Kangaslampi, <b>34</b> &raquo; Jylh√§, <b>14M</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>26</b> &raquo; Jylh√§, <b>13</b> &raquo; Viitaniemi, <b>12K</b> &raquo; Palokangas, <b>36K</b> &raquo; L√§nsiranta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>27/28</b> &raquo; Tikkakoski, <b>36</b> &raquo; L√§nsiranta, <b>1312K</b> &raquo; Kauppatori, <b>40</b> &raquo; Suolahti, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>18</b> &raquo; Kortepohja, <b>12K</b> &raquo; Kauppatori (Palokangas), <b>3</b> &raquo; Keskussairaala, <b>10</b> &raquo; Viitaniemi
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=LounaJyv%232490.10471&amp;name_list=Lounaispuisto%202&amp;key=keskusta'>
+                 Lounaispuisto 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>8</b> &raquo; Nen√§inniemi, <b>21M</b> &raquo; Jaakkola, <b>16</b> &raquo; Muuratsalo, <b>12</b> &raquo; Myllyj√§rvi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22</b> &raquo; Viherlandia, <b>14</b> &raquo; Verkkoniemi, <b>6</b> &raquo; Keskussairaala, <b>5</b> &raquo; Ylist√∂nm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>15</b> &raquo; Viherlandia, <b>21</b> &raquo; Jaakkola, <b>13M</b> &raquo; Korpilahti, <b>16M</b> &raquo; Muuratsalo, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14M</b> &raquo; Verkkoniemi, <b>16</b> &raquo; S√§yn√§tsalo, <b>12</b> &raquo; Keltinm√§ki, <b>16M</b> &raquo; S√§yn√§tsalo, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2M</b> &raquo; Keskussairaala, <b>14</b> &raquo; Korpilahti, <b>26</b> &raquo; Ylist√∂nm√§ki, <b>13M</b> &raquo; J√§ms√§nkoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14</b> &raquo; Teollisuuskyl√§, <b>15</b> &raquo; Viherlaakso, <b>12</b> &raquo; Helokantie, <b>14M</b> &raquo; Muuramen teollisuuskyl√§, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14</b> &raquo; Niittyaho
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=LounaJyv%232490.16024&amp;name_list=Lounaispuisto&amp;key=keskusta'>
+                 Lounaispuisto, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>12</b> &raquo; Keltinm√§ki
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Satama%2320844.10459&amp;name_list=Satama%202&amp;key=keskusta'>
+                 Satama 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>18K</b> &raquo; Nen√§inniemi, <b>19</b> &raquo; Samulinniemi, <b>20</b> &raquo; Kuokkala, <b>18</b> &raquo; Ristikivi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Kuokkala, <b>15K</b> &raquo; Viherlandia, <b>4</b> &raquo; V√§in√∂l√§
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320900.10286&amp;name_list=Harjun%20oppilaitos%201&amp;key=keskusta'>
+                 Harjun oppilaitos 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Keltinm√§ki, <b>36/27</b> &raquo; Mustalampi, <b>8</b> &raquo; Nen√§inniemi, <b>41</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Muuratsalo, <b>22</b> &raquo; Keskusta, <b>22</b> &raquo; Viherlandia, <b>34</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Keskusta, <b>28</b> &raquo; Keskusta, <b>41</b> &raquo; Jyv√§skyl√§ keskusta, <b>41</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16M</b> &raquo; Muuratsalo, <b>5</b> &raquo; Ylist√∂nm√§ki, <b>15K</b> &raquo; Viherlandia, <b>26</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16M</b> &raquo; S√§yn√§tsalo, <b>3</b> &raquo; Asmalampi, <b>36K</b> &raquo; Keskusta, <b>36</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>40</b> &raquo; Keskussairaala, <b>12K</b> &raquo; Yl√§myllyj√§rvi, <b>12</b> &raquo; Keltinm√§ki, <b>26</b> &raquo; Ylist√∂nm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12/13</b> &raquo; Muurame, <b>16</b> &raquo; Keskusta, <b>4</b> &raquo; V√§in√∂l√§, <b>10</b> &raquo; Kaakkolampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12/27</b> &raquo; Mustalampi, <b>32</b> &raquo; Keskusta, <b>41</b> &raquo; Jyv√§skyl√§ Keskusta, <b>39</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Jyv√§skyl√§ Keskussairaala, <b>40</b> &raquo; Jyv√§skyl√§, <b>27</b> &raquo; Kauppatori, <b>41</b> &raquo; Jyv√§skyl√§ keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12</b> &raquo; Myllyj√§rvi
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320900.12298&amp;name_list=Harjun%20oppilaitos&amp;key=keskusta'>
+                 Harjun oppilaitos, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>32</b> &raquo; Vertaala, <b>41</b> &raquo; Laukaa, <b>41</b> &raquo; Vihtavuori, <b>41</b> &raquo; Laukaa-Peurunka, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Peurunka, <b>41</b> &raquo; √Ñ√§nekoski, <b>12K</b> &raquo; Palokangas, <b>41</b> &raquo; Peurunka-√Ñ√§nekoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Keskussairaala ¬ñ Keskusta ¬ñ Laukaa¬ñPeurunka, <b>1312K</b> &raquo; Kauppatori, <b>41</b> &raquo; Laukaa-√Ñ√§nekoski, <b>12K</b> &raquo; Kauppatori (Palokangas)
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=VanhHaut%2321344.34296&amp;name_list=Vanha%20Hautausmaa%201&amp;key=keskusta'>
+                 Vanha Hautausmaa 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Keskusta, <b>12</b> &raquo; Keltinm√§ki, <b>12</b> &raquo; Myllyj√§rvi, <b>35</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Kuokkala, <b>35</b> &raquo; Keskusta, <b>37</b> &raquo; Ruoke-Nuutti, <b>31</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22M</b> &raquo; Keskussairaala, <b>22</b> &raquo; Viherlandia, <b>22</b> &raquo; Keskusta, <b>33</b> &raquo; Kirri, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12</b> &raquo; Helokantie, <b>22M</b> &raquo; Keskusta, <b>12</b> &raquo; Keskussairaala
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Pitk%C3%A4k%2320944.10341&amp;name_list=Pitk%C3%A4katu%202&amp;key=keskusta'>
+                 Pitk√§katu 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>36/27</b> &raquo; Mustalampi, <b>25K</b> &raquo; Palokankeskus, <b>18K</b> &raquo; Kortepohja, <b>35</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>25</b> &raquo; Haukkala, <b>1</b> &raquo; Kortem√§ki, <b>2</b> &raquo; Kortem√§ki, <b>2/25</b> &raquo; Kortem√§ki th, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Keskussairaala, <b>25</b> &raquo; Laajavuori, <b>6</b> &raquo; Keskussairaala, <b>13</b> &raquo; Tikkala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>18</b> &raquo; Kortepohja, <b>19</b> &raquo; Keskussairaala, <b>2M</b> &raquo; Cygnaeuksen koulu, <b>27</b> &raquo; Keltinm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>37</b> &raquo; Ruoke-Nuutti, <b>2</b> &raquo; Keskussairaala, <b>12K</b> &raquo; Yl√§myllyj√§rvi, <b>43</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12/13</b> &raquo; Muurame, <b>10</b> &raquo; Keskussairaala, <b>40</b> &raquo; Keskussairaala, <b>18</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22M</b> &raquo; Keskussairaala, <b></b> &raquo; Lahjaharjun hautausmaa, <b>12K</b> &raquo; Keskusta, <b>41</b> &raquo; Jyv√§skyl√§ keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>1M</b> &raquo; Cygnaeuksen koulu, <b>39</b> &raquo; Kuohu, <b>12</b> &raquo; Keskussairaala, <b>41</b> &raquo; Jyv√§skyl√§ Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Helokantie, <b>10</b> &raquo; Keltinm√§ki, <b></b> &raquo; T√∂lsk√§n th, <b>42</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12/27</b> &raquo; Mustalampi
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Pitk%C3%A4k%2320944.10342&amp;name_list=Pitk%C3%A4katu%201&amp;key=keskusta'>
+                 Pitk√§katu 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Kaunisharju, <b>27</b> &raquo; Heikkil√§, <b>1</b> &raquo; Haapaniemi, <b>18</b> &raquo; Ristikivi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>19</b> &raquo; Samulinniemi, <b>25K</b> &raquo; Kaakkolampi, <b>3</b> &raquo; Vaajakoski, <b>25</b> &raquo; Kaakkolampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Peurunka-√Ñ√§nekoski, <b>18K</b> &raquo; Nen√§inniemi, <b>41</b> &raquo; Laukaa-Peurunka, <b>41</b> &raquo; Vihtavuori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>6</b> &raquo; Matkakeskus, <b>41</b> &raquo; Laukaa-√Ñ√§nekoski, <b>12K</b> &raquo; Kauppatori, <b>27</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Kangaslampi, <b>40</b> &raquo; √Ñ√§nekoski-Suolahti, <b>13</b> &raquo; Kauppatori, <b>35</b> &raquo; Haukkam√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Nojosniemi, <b>42</b> &raquo; Vuontee--Lievestuore, <b>2M</b> &raquo; Kaunisharju, <b>1312K</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12K</b> &raquo; Keskusta, <b>37</b> &raquo; Nuutti-Ruoke, <b>43</b> &raquo; Lievestuore, <b>18</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Keskusta, <b>2</b> &raquo; Vaajakoski, <b>12K</b> &raquo; Kauppatori (Palokangas), <b>1M</b> &raquo; Haapaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22M</b> &raquo; Tikkakoski, <b>18K</b> &raquo; Keskusta, <b>13</b> &raquo; Viitaniemi, <b>27/28</b> &raquo; Tikkakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Kaakkolampi, <b>2</b> &raquo; Asmalampi-Kaunisharju, <b>41</b> &raquo; √Ñ√§nekoski, <b>43</b> &raquo; Hankasalmi kk
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=VanhHaut%2321344.10964&amp;name_list=Vanha%20hautausmaa%202&amp;key=keskusta'>
+                 Vanha hautausmaa 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>12</b> &raquo; Kangaslampi, <b>33</b> &raquo; Kirri, <b>37</b> &raquo; Nuutti-Ruoke, <b>22M</b> &raquo; Tikkakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>35</b> &raquo; Haukkam√§ki, <b>22</b> &raquo; Tikkakoski, <b>31</b> &raquo; Vertaala
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=%C3%84lyl%C3%A4%2320857.10481&amp;name_list=%C3%84lyl%C3%A4&amp;key=keskusta'>
+                 √Ñlyl√§, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>2M</b> &raquo; Kaunisharju, <b>15</b> &raquo; Keskusta, <b>16</b> &raquo; Kauppatori, <b>16M</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12</b> &raquo; Kangaslampi, <b>20</b> &raquo; Pupuhuhta, <b>16</b> &raquo; Keskussairaala, <b>21</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22</b> &raquo; L√§nsiranta, <b>14</b> &raquo; Viitaniemi, <b>14</b> &raquo; Keskusta, <b>21M</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22</b> &raquo; Tikkakoski, <b>22</b> &raquo; Keskusta, <b>14M</b> &raquo; Kauppatori, <b>8</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>13M</b> &raquo; Kauppatori, <b>8</b> &raquo; Viitaniemi, <b>15</b> &raquo; Kauppatori, <b>14M</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>13M</b> &raquo; Jyv√§skyl√§ Kauppatori, <b>14</b> &raquo; Kauppatori, <b>14M</b> &raquo; Viitaniemi, <b>12K</b> &raquo; Kangaslampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14</b> &raquo; Tourula, <b>20</b> &raquo; Keskusta, <b>16</b> &raquo; kauppatori
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320900.10287&amp;name_list=Harjun%20oppilaitos%202&amp;key=keskusta'>
+                 Harjun oppilaitos 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Heikkil√§, <b>36</b> &raquo; Tikkakoski, <b>22</b> &raquo; Tikkakoski, <b>16</b> &raquo; Kirri, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22</b> &raquo; L√§nsiranta, <b>40</b> &raquo; √Ñ√§nekoski-Suolahti, <b>26</b> &raquo; Hein√§lampi, <b>28</b> &raquo; Tikkakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>32</b> &raquo; Vertaala, <b>36K</b> &raquo; L√§nsiranta, <b>36</b> &raquo; L√§nsiranta, <b>26</b> &raquo; Jylh√§, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12K</b> &raquo; Kangaslampi, <b>34</b> &raquo; Jylh√§, <b>27/28</b> &raquo; Tikkakoski, <b>40</b> &raquo; Suolahti
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Tourula%232503.10353&amp;name_list=Tourula%201&amp;key=keskusta'>
+                 Tourula 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>1</b> &raquo; Kortem√§ki, <b>25K</b> &raquo; Palokankeskus, <b>20</b> &raquo; Kuokkala, <b>25</b> &raquo; Laajavuori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>3</b> &raquo; Kirjasto, <b>25</b> &raquo; Haukkala, <b>2</b> &raquo; Kortem√§ki, <b>1</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>3</b> &raquo; Keskussairaala, <b>2/25</b> &raquo; Kortem√§ki th, <b>10</b> &raquo; Keltinm√§ki, <b>38K</b> &raquo; Cygnaeuksen Koulu, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b></b> &raquo; T√∂lsk√§n th, <b>1</b> &raquo; Keskussairaala, <b>4</b> &raquo; Keskussairaala, <b>2</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Keskussairaala, <b>43</b> &raquo; Keskussairaala, <b>42</b> &raquo; Keskussairaala, <b>10</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b></b> &raquo; Lahjaharjun hautausmaa, <b>14M</b> &raquo; Muuramen teollisuuskyl√§, <b>38K</b> &raquo; Keskusta, <b>43</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>25</b> &raquo; Keskusta, <b>38</b> &raquo; Cygnaeuksen koulu, <b>10</b> &raquo; Viitaniemi
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Tourula%232503.10352&amp;name_list=Tourula%202&amp;key=keskusta'>
+                 Tourula 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Kaunisharju, <b>1</b> &raquo; Haapaniemi, <b>25</b> &raquo; Kaakkolampi, <b>3</b> &raquo; Vaajakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>15</b> &raquo; Keskusta, <b>20</b> &raquo; Pupuhuhta, <b>25K</b> &raquo; Kaakkolampi, <b>3</b> &raquo; Asmalampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Kangaslampi, <b>4</b> &raquo; V√§in√∂l√§, <b>10</b> &raquo; Kaakkolampi, <b>43</b> &raquo; Hankasalmi kk, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>43</b> &raquo; Lievestuore, <b>14</b> &raquo; Tourula, <b>2</b> &raquo; Nojosniemi, <b>2</b> &raquo; Asmalampi-Kaunisharju, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>42</b> &raquo; Vuontee--Lievestuore, <b>2</b> &raquo; Vaajakoski, <b>38</b> &raquo; Ilmoniemi
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Sep%C3%A4nk%2321083.10760&amp;name_list=Sep%C3%A4nkatu%202&amp;key=keskusta'>
+                 Sep√§nkatu 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Keskussairaala, <b>15K</b> &raquo; Keskussairaala, <b>10</b> &raquo; Viitaniemi, <b>5</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>8</b> &raquo; Viitaniemi, <b>16M</b> &raquo; Viitaniemi, <b>4</b> &raquo; Keskussairaala, <b>3</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14</b> &raquo; Viitaniemi, <b>14M</b> &raquo; Viitaniemi, <b>1M</b> &raquo; Viitaniemi, <b>13</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>18</b> &raquo; Kortepohja
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%232494.10504&amp;name_list=Ammattikorkeakoulu%201&amp;key=keskusta'>
+                 Ammattikorkeakoulu 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Keltinm√§ki, <b>36/27</b> &raquo; Mustalampi, <b>41</b> &raquo; Keskussairaala, <b>22</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22</b> &raquo; Viherlandia, <b>34</b> &raquo; Keskusta, <b>27</b> &raquo; Keskusta, <b>28</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Jyv√§skyl√§ keskusta, <b>41</b> &raquo; Keskusta, <b>26</b> &raquo; Keskusta, <b>40</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12</b> &raquo; Keltinm√§ki, <b>36K</b> &raquo; Keskusta, <b>36</b> &raquo; Keskusta, <b>16</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>39</b> &raquo; Keskusta, <b>12K</b> &raquo; Yl√§myllyj√§rvi, <b>32</b> &raquo; Keskusta, <b>26</b> &raquo; Ylist√∂nm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12/13</b> &raquo; Muurame, <b>12/27</b> &raquo; Mustalampi, <b>41</b> &raquo; Jyv√§skyl√§ Keskusta, <b>41</b> &raquo; Jyv√§skyl√§ Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>40</b> &raquo; Jyv√§skyl√§, <b>27</b> &raquo; Kauppatori, <b>41</b> &raquo; Jyv√§skyl√§ keskussairaala, <b>12</b> &raquo; Myllyj√§rvi
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Sep%C3%A4nk%2321083.10759&amp;name_list=Sep%C3%A4nkatu%201&amp;key=keskusta'>
+                 Sep√§nkatu 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Muuratsalo, <b>15K</b> &raquo; Viherlandia, <b>10</b> &raquo; Keltinm√§ki, <b>3</b> &raquo; Asmalampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Kaakkolampi, <b>4</b> &raquo; V√§in√∂l√§, <b>16M</b> &raquo; S√§yn√§tsalo, <b>27</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16M</b> &raquo; Muuratsalo
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%232494.10505&amp;name_list=Ammattikorkeakoulu%202&amp;key=keskusta'>
+                 Ammattikorkeakoulu 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Heikkil√§, <b>36</b> &raquo; Tikkakoski, <b>22</b> &raquo; Tikkakoski, <b>16</b> &raquo; Kirri, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; √Ñ√§nekoski, <b>32</b> &raquo; Vertaala, <b>41</b> &raquo; Peurunka-√Ñ√§nekoski, <b>22</b> &raquo; L√§nsiranta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Laukaa-Peurunka, <b>26</b> &raquo; Hein√§lampi, <b>28</b> &raquo; Tikkakoski, <b>41</b> &raquo; Laukaa-√Ñ√§nekoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Vihtavuori, <b>40</b> &raquo; √Ñ√§nekoski-Suolahti, <b>12K</b> &raquo; Kauppatori (Palokangas), <b>36K</b> &raquo; L√§nsiranta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>36</b> &raquo; L√§nsiranta, <b>26</b> &raquo; Jylh√§, <b>12K</b> &raquo; Kangaslampi, <b>34</b> &raquo; Jylh√§, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Keskussairaala ¬ñ Keskusta ¬ñ Laukaa¬ñPeurunka, <b>12K</b> &raquo; Palokangas, <b>27/28</b> &raquo; Tikkakoski, <b>1312K</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>40</b> &raquo; Suolahti
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Vellam%2321244.10753&amp;name_list=Vellamonkatu%201&amp;key=keskusta'>
+                 Vellamonkatu 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Muuratsalo, <b>4</b> &raquo; V√§in√∂l√§, <b>15K</b> &raquo; Viherlandia, <b>10</b> &raquo; Keltinm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>3</b> &raquo; Asmalampi, <b>10</b> &raquo; Kaakkolampi, <b>27</b> &raquo; Keskusta
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320899.10965&amp;name_list=Kunnantalo%2011&amp;key=keskusta'>
+                 Kunnantalo 11, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Keskusta, <b>12</b> &raquo; Keltinm√§ki, <b>12</b> &raquo; Myllyj√§rvi, <b>35</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Kuokkala, <b>35</b> &raquo; Keskusta, <b>37</b> &raquo; Ruoke-Nuutti, <b>12</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>31</b> &raquo; Keskusta, <b>22M</b> &raquo; Keskussairaala, <b>26</b> &raquo; Keskusta, <b>22</b> &raquo; Viherlandia, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>34</b> &raquo; Keskusta, <b>22</b> &raquo; Keskusta, <b>12</b> &raquo; Helokantie, <b>22M</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>26</b> &raquo; Ylist√∂nm√§ki
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Cygkoul%2320943.10337&amp;name_list=Cygnaeuksen%20koulu%201&amp;key=keskusta'>
+                 Cygnaeuksen koulu 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Kaunisharju, <b>27</b> &raquo; Heikkil√§, <b>1</b> &raquo; Haapaniemi, <b>18</b> &raquo; Ristikivi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>19</b> &raquo; Samulinniemi, <b>25K</b> &raquo; Kaakkolampi, <b>3</b> &raquo; Vaajakoski, <b>25</b> &raquo; Kaakkolampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Peurunka-√Ñ√§nekoski, <b>18K</b> &raquo; Nen√§inniemi, <b>41</b> &raquo; Laukaa-Peurunka, <b>41</b> &raquo; Vihtavuori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>6</b> &raquo; Matkakeskus, <b>41</b> &raquo; Laukaa-√Ñ√§nekoski, <b>12K</b> &raquo; Kauppatori, <b>27</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Kangaslampi, <b>40</b> &raquo; √Ñ√§nekoski-Suolahti, <b>13</b> &raquo; Kauppatori, <b>35</b> &raquo; Haukkam√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Nojosniemi, <b>42</b> &raquo; Vuontee--Lievestuore, <b>2M</b> &raquo; Kaunisharju, <b>1312K</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12K</b> &raquo; Keskusta, <b>37</b> &raquo; Nuutti-Ruoke, <b>43</b> &raquo; Lievestuore, <b>18</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Keskusta, <b>2</b> &raquo; Vaajakoski, <b>12K</b> &raquo; Kauppatori (Palokangas), <b>1M</b> &raquo; Haapaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22M</b> &raquo; Tikkakoski, <b>18K</b> &raquo; Keskusta, <b>13</b> &raquo; Viitaniemi, <b>27/28</b> &raquo; Tikkakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Kaakkolampi, <b>2</b> &raquo; Asmalampi-Kaunisharju, <b>41</b> &raquo; √Ñ√§nekoski, <b>43</b> &raquo; Hankasalmi kk
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320899.10503&amp;name_list=Kunnantalo%201&amp;key=keskusta'>
+                 Kunnantalo 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Keltinm√§ki, <b>36/27</b> &raquo; Mustalampi, <b>41</b> &raquo; Keskussairaala, <b>22</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22</b> &raquo; Viherlandia, <b>34</b> &raquo; Keskusta, <b>27</b> &raquo; Keskusta, <b>28</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Jyv√§skyl√§ keskusta, <b>41</b> &raquo; Keskusta, <b>12</b> &raquo; Myllyj√§rvi, <b>40</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12</b> &raquo; Keltinm√§ki, <b>36K</b> &raquo; Keskusta, <b>36</b> &raquo; Keskusta, <b>16</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Kirri, <b>39</b> &raquo; Keskusta, <b>12K</b> &raquo; Yl√§myllyj√§rvi, <b>32</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12/13</b> &raquo; Muurame, <b>26</b> &raquo; Ylist√∂nm√§ki, <b>26</b> &raquo; Keskusta, <b>12/27</b> &raquo; Mustalampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Jyv√§skyl√§ Keskusta, <b>41</b> &raquo; Jyv√§skyl√§ Keskussairaala, <b>40</b> &raquo; Jyv√§skyl√§, <b>27</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Jyv√§skyl√§ keskussairaala
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Vellam%2321244.10754&amp;name_list=Vellamonkatu%202&amp;key=keskusta'>
+                 Vellamonkatu 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Keskussairaala, <b>15K</b> &raquo; Keskussairaala, <b>4</b> &raquo; Keskussairaala, <b>3</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>1M</b> &raquo; Haapaniemi
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Cygkoul%2320943.10338&amp;name_list=Cygnaeuksen%20koulu%202&amp;key=keskusta'>
+                 Cygnaeuksen koulu 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>36/27</b> &raquo; Mustalampi, <b>25K</b> &raquo; Palokankeskus, <b>18K</b> &raquo; Kortepohja, <b>35</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>25</b> &raquo; Haukkala, <b>1</b> &raquo; Kortem√§ki, <b>2</b> &raquo; Kortem√§ki, <b>2/25</b> &raquo; Kortem√§ki th, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Keskussairaala, <b>25</b> &raquo; Laajavuori, <b>6</b> &raquo; Keskussairaala, <b>13</b> &raquo; Tikkala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>18</b> &raquo; Kortepohja, <b>19</b> &raquo; Keskussairaala, <b>2M</b> &raquo; Cygnaeuksen koulu, <b>27</b> &raquo; Keltinm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>37</b> &raquo; Ruoke-Nuutti, <b>2</b> &raquo; Keskussairaala, <b>12K</b> &raquo; Yl√§myllyj√§rvi, <b>43</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12/13</b> &raquo; Muurame, <b>10</b> &raquo; Keskussairaala, <b>18</b> &raquo; Keskussairaala, <b>22M</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b></b> &raquo; Lahjaharjun hautausmaa, <b>40</b> &raquo; Keskussairaala, <b>12K</b> &raquo; Keskusta, <b>41</b> &raquo; Jyv√§skyl√§ keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>1M</b> &raquo; Cygnaeuksen koulu, <b>38</b> &raquo; Cygnaeuksen koulu, <b>39</b> &raquo; Kuohu, <b>12</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Jyv√§skyl√§ Keskussairaala, <b>10</b> &raquo; Helokantie, <b>10</b> &raquo; Keltinm√§ki, <b>38K</b> &raquo; Cygnaeuksen Koulu, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b></b> &raquo; T√∂lsk√§n th, <b>42</b> &raquo; Keskussairaala, <b>12/27</b> &raquo; Mustalampi
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Amkoul%2321081.10755&amp;name_list=Ammattikoulu%201&amp;key=keskusta'>
+                 Ammattikoulu 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Muuratsalo, <b>15K</b> &raquo; Viherlandia, <b>10</b> &raquo; Keltinm√§ki, <b>3</b> &raquo; Asmalampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Kaakkolampi, <b>4</b> &raquo; V√§in√∂l√§, <b>16M</b> &raquo; S√§yn√§tsalo, <b>27</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16M</b> &raquo; Muuratsalo
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Amkoul%2321081.10756&amp;name_list=Ammattikoulu%202&amp;key=keskusta'>
+                 Ammattikoulu 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Keskussairaala, <b>15K</b> &raquo; Keskussairaala, <b>8</b> &raquo; Nen√§inniemi, <b>5</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>5</b> &raquo; Ylist√∂nm√§ki, <b>8</b> &raquo; Viitaniemi, <b>16M</b> &raquo; Viitaniemi, <b>4</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>3</b> &raquo; Keskussairaala, <b>14M</b> &raquo; Viitaniemi, <b>14</b> &raquo; Viitaniemi, <b>1M</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>13</b> &raquo; Viitaniemi, <b>18</b> &raquo; Kortepohja, <b>1M</b> &raquo; Haapaniemi, <b>10</b> &raquo; Viitaniemi
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=MuseoJKL%232510.10472&amp;name_list=Museo%202&amp;key=keskusta'>
+                 Museo 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>8</b> &raquo; Nen√§inniemi, <b>22</b> &raquo; Viherlandia, <b>5</b> &raquo; Ylist√∂nm√§ki, <b>15</b> &raquo; Viherlaakso, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>15</b> &raquo; Viherlandia, <b>26</b> &raquo; Ylist√∂nm√§ki
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Voiokoul%2320995.10340&amp;name_list=Voionmaan%20koulu%201&amp;key=keskusta'>
+                 Voionmaan koulu 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Muuratsalo, <b>4</b> &raquo; V√§in√∂l√§, <b>15K</b> &raquo; Viherlandia, <b>3</b> &raquo; Asmalampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Kaakkolampi, <b>27</b> &raquo; Keskusta
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Viitanie%2321082.10758&amp;name_list=Viitaniemi%202&amp;key=keskusta'>
+                 Viitaniemi 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Keskussairaala, <b>15K</b> &raquo; Keskussairaala, <b>10</b> &raquo; Viitaniemi, <b>8</b> &raquo; Nen√§inniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>5</b> &raquo; Viitaniemi, <b>39</b> &raquo; Kuohu, <b>8</b> &raquo; Viitaniemi, <b>16M</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>4</b> &raquo; Keskussairaala, <b>5</b> &raquo; Ylist√∂nm√§ki, <b>3</b> &raquo; Keskussairaala, <b>14M</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14</b> &raquo; Viitaniemi, <b>1M</b> &raquo; Viitaniemi, <b>13</b> &raquo; Viitaniemi, <b>18</b> &raquo; Kortepohja
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Matniem%2320856.10473&amp;name_list=Mattilanniemi&amp;key=keskusta'>
+                 Mattilanniemi, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>5</b> &raquo; Ylist√∂nm√§ki, <b>20</b> &raquo; Pupuhuhta, <b>20</b> &raquo; Keskusta, <b>26</b> &raquo; Ylist√∂nm√§ki
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Viitanie%2321082.10757&amp;name_list=Viitaniemi%201&amp;key=keskusta'>
+                 Viitaniemi 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Muuratsalo, <b>39</b> &raquo; Viitaniemi, <b>15K</b> &raquo; Viherlandia, <b>10</b> &raquo; Keltinm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>3</b> &raquo; Asmalampi, <b>10</b> &raquo; Kaakkolampi, <b>4</b> &raquo; V√§in√∂l√§, <b>16M</b> &raquo; S√§yn√§tsalo, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Keskusta, <b>13M</b> &raquo; Korpilahti, <b>13</b> &raquo; Muurame, <b>16M</b> &raquo; Muuratsalo
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320899.10502&amp;name_list=Kunnantalo%202&amp;key=keskusta'>
+                 Kunnantalo 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Heikkil√§, <b>33</b> &raquo; Kirri, <b>36</b> &raquo; Tikkakoski, <b>22</b> &raquo; Tikkakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22M</b> &raquo; Tikkakoski, <b>16</b> &raquo; Kirri, <b>41</b> &raquo; √Ñ√§nekoski, <b>12</b> &raquo; Kangaslampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>32</b> &raquo; Vertaala, <b>33</b> &raquo; Keskusta, <b>41</b> &raquo; Peurunka-√Ñ√§nekoski, <b>22</b> &raquo; L√§nsiranta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Laukaa-Peurunka, <b>26</b> &raquo; Hein√§lampi, <b>35</b> &raquo; Haukkam√§ki, <b>28</b> &raquo; Tikkakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Laukaa-√Ñ√§nekoski, <b>41</b> &raquo; Vihtavuori, <b>40</b> &raquo; √Ñ√§nekoski, <b>40</b> &raquo; √Ñ√§nekoski-Suolahti, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12K</b> &raquo; Kangaslampi, <b>12K</b> &raquo; Palokangas, <b>26</b> &raquo; Jylh√§, <b>36</b> &raquo; L√§nsiranta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>1312K</b> &raquo; Kauppatori, <b>37</b> &raquo; Nuutti-Ruoke, <b>40</b> &raquo; Suolahti, <b>12K</b> &raquo; Kauppatori (Palokangas), <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>36K</b> &raquo; L√§nsiranta, <b>34</b> &raquo; Jylh√§, <b>41</b> &raquo; Keskussairaala ¬ñ Keskusta ¬ñ Laukaa¬ñPeurunka, <b>31</b> &raquo; Vertaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>27/28</b> &raquo; Tikkakoski
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Voiokoul%2320995.10339&amp;name_list=Voionmaan%20koulu%202&amp;key=keskusta'>
+                 Voionmaan koulu 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Keltinm√§ki, <b>1</b> &raquo; Kortem√§ki, <b>15K</b> &raquo; Keskussairaala, <b>10</b> &raquo; Helokantie, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>36/27</b> &raquo; Mustalampi, <b>19</b> &raquo; Keskussairaala, <b>25</b> &raquo; Laajavuori, <b>41</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>35</b> &raquo; Keskussairaala, <b>25</b> &raquo; Haukkala, <b>16</b> &raquo; Keskussairaala, <b>2</b> &raquo; Kortem√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>3</b> &raquo; Keskussairaala, <b>2/25</b> &raquo; Kortem√§ki th, <b>10</b> &raquo; Keltinm√§ki, <b>13</b> &raquo; Tikkala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12K</b> &raquo; Keskusta, <b></b> &raquo; T√∂lsk√§n th, <b>4</b> &raquo; Keskussairaala, <b>37</b> &raquo; Ruoke-Nuutti, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>39</b> &raquo; Kuohu, <b>40</b> &raquo; Keskussairaala, <b>2</b> &raquo; Keskussairaala, <b>12K</b> &raquo; Yl√§myllyj√§rvi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>43</b> &raquo; Keskussairaala, <b>42</b> &raquo; Keskussairaala, <b>10</b> &raquo; Keskussairaala, <b>12/13</b> &raquo; Muurame, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12/27</b> &raquo; Mustalampi, <b>18</b> &raquo; Keskussairaala, <b>18</b> &raquo; Kortepohja, <b>22M</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b></b> &raquo; Lahjaharjun hautausmaa, <b>41</b> &raquo; Jyv√§skyl√§ Keskussairaala, <b>41</b> &raquo; Jyv√§skyl√§ keskussairaala, <b>12</b> &raquo; Keskussairaala
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Jyvyliop%232478.11083&amp;name_list=Yliopisto%201&amp;key=keskusta'>
+                 Yliopisto 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>2M</b> &raquo; Kaunisharju, <b>16</b> &raquo; Kauppatori, <b>16M</b> &raquo; Viitaniemi, <b>12</b> &raquo; Kangaslampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Keskussairaala, <b>21</b> &raquo; Kauppatori, <b>14</b> &raquo; Keskusta, <b>13M</b> &raquo; Jyv√§skyl√§ Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14</b> &raquo; Viitaniemi, <b>13M</b> &raquo; Kauppatori, <b>14</b> &raquo; Tourula, <b>14M</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14M</b> &raquo; Kauppatori, <b>14</b> &raquo; Kauppatori, <b>21M</b> &raquo; Kauppatori, <b>14M</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12K</b> &raquo; Kangaslampi, <b>16</b> &raquo; kauppatori
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Touruto%2320839.10423&amp;name_list=Tourutorni%201&amp;key=keskusta'>
+                 Tourutorni 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>1</b> &raquo; Kortem√§ki, <b>10</b> &raquo; Helokantie, <b>25K</b> &raquo; Palokankeskus, <b>20</b> &raquo; Kuokkala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>25</b> &raquo; Laajavuori, <b>3</b> &raquo; Kirjasto, <b>25</b> &raquo; Haukkala, <b>2</b> &raquo; Kortem√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>1</b> &raquo; Keskusta, <b>3</b> &raquo; Keskussairaala, <b>2/25</b> &raquo; Kortem√§ki th, <b>10</b> &raquo; Keltinm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b></b> &raquo; T√∂lsk√§n th, <b>1</b> &raquo; Keskussairaala, <b>4</b> &raquo; Keskussairaala, <b>2</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Keskussairaala, <b>42</b> &raquo; Keskussairaala, <b>10</b> &raquo; Keskussairaala, <b>25</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b></b> &raquo; Lahjaharjun hautausmaa, <b>43</b> &raquo; Keskusta, <b>38</b> &raquo; Cygnaeuksen koulu, <b>10</b> &raquo; Viitaniemi
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Ohjkaar%2321088.10468&amp;name_list=Ohjelmakaari%202&amp;key=keskusta'>
+                 Ohjelmakaari 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>5</b> &raquo; Ylist√∂nm√§ki, <b>26</b> &raquo; Ylist√∂nm√§ki
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Jyvyliop%232478.11084&amp;name_list=Yliopisto%202&amp;key=keskusta'>
+                 Yliopisto 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>21M</b> &raquo; Jaakkola, <b>16</b> &raquo; Muuratsalo, <b>12</b> &raquo; Myllyj√§rvi, <b>14</b> &raquo; Verkkoniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2M</b> &raquo; Keskussairaala, <b>6</b> &raquo; Keskussairaala, <b>21</b> &raquo; Jaakkola, <b>12</b> &raquo; Keltinm√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>14</b> &raquo; Korpilahti, <b>13M</b> &raquo; Korpilahti, <b>14M</b> &raquo; Verkkoniemi, <b>16M</b> &raquo; Muuratsalo, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; S√§yn√§tsalo, <b>16M</b> &raquo; S√§yn√§tsalo, <b>13M</b> &raquo; J√§ms√§nkoski, <b>14</b> &raquo; Teollisuuskyl√§, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12</b> &raquo; Helokantie, <b>14M</b> &raquo; Muuramen teollisuuskyl√§, <b>14</b> &raquo; Niittyaho
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Syrj%C3%A4l%2321285.10830&amp;name_list=Syrj%C3%A4l%C3%A4%202&amp;key=keskusta'>
+                 Syrj√§l√§ 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>25</b> &raquo; Laajavuori, <b>25K</b> &raquo; Palokankeskus, <b>18K</b> &raquo; Kortepohja, <b>18</b> &raquo; Kortepohja, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>25</b> &raquo; Haukkala
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Syrj%C3%A4l%2321285.10829&amp;name_list=Syrj%C3%A4l%C3%A4%201&amp;key=keskusta'>
+                 Syrj√§l√§ 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>25</b> &raquo; Kaakkolampi, <b>18K</b> &raquo; Nen√§inniemi, <b>25K</b> &raquo; Kaakkolampi, <b>18</b> &raquo; Ristikivi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>18</b> &raquo; Keskusta, <b>18K</b> &raquo; Keskusta
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=KorpeJKL%2320845.10479&amp;name_list=Korpela%201&amp;key=keskusta'>
+                 Korpela 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>15K</b> &raquo; Keskussairaala, <b>19</b> &raquo; Keskussairaala, <b>33</b> &raquo; Kirri, <b>5</b> &raquo; Viitaniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>5</b> &raquo; Kauppatori, <b>5</b> &raquo; Keskusta, <b>18K</b> &raquo; Keskusta, <b>18K</b> &raquo; Kortepohja, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>18</b> &raquo; Kortepohja, <b>18</b> &raquo; Keskusta, <b>26</b> &raquo; Hein√§lampi, <b>18</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>4</b> &raquo; Keskusta, <b>4</b> &raquo; Keskussairaala, <b>19</b> &raquo; Keskusta
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Patterit%2321084.10461&amp;name_list=Patteritie%201&amp;key=keskusta'>
+                 Patteritie 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Kirri, <b>5</b> &raquo; Viitaniemi, <b>5</b> &raquo; Kauppatori, <b>5</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Kuokkala, <b>26</b> &raquo; Hein√§lampi
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Kemianl%2321089.10477&amp;name_list=Kemianlaitos%202&amp;key=keskusta'>
+                 Kemianlaitos 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>5</b> &raquo; Ylist√∂nm√§ki, <b>26</b> &raquo; Ylist√∂nm√§ki
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Kylm%C3%A4nor%2321086.10467&amp;name_list=Kylm%C3%A4noro%201&amp;key=keskusta'>
+                 Kylm√§noro 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>5</b> &raquo; Viitaniemi, <b>5</b> &raquo; Kauppatori, <b>5</b> &raquo; Keskusta, <b>26</b> &raquo; Hein√§lampi
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=J%C3%A4%C3%A4halli%2320942.10336&amp;name_list=J%C3%A4%C3%A4halli%201&amp;key=keskusta'>
+                 J√§√§halli 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Kaunisharju, <b>27</b> &raquo; Heikkil√§, <b>1</b> &raquo; Haapaniemi, <b>16</b> &raquo; Muuratsalo, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; √Ñ√§nekoski, <b>27</b> &raquo; Keskusta, <b>19</b> &raquo; Samulinniemi, <b>6</b> &raquo; Matkakeskus, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>3</b> &raquo; Vaajakoski, <b>41</b> &raquo; Peurunka-√Ñ√§nekoski, <b>13</b> &raquo; Kauppatori, <b>41</b> &raquo; Laukaa-Peurunka, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>15K</b> &raquo; Viherlandia, <b>3</b> &raquo; Asmalampi, <b>35</b> &raquo; Haukkam√§ki, <b>12K</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Laukaa-√Ñ√§nekoski, <b>25</b> &raquo; Kaakkolampi, <b>41</b> &raquo; Vihtavuori, <b>12K</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Kangaslampi, <b>40</b> &raquo; √Ñ√§nekoski, <b>40</b> &raquo; √Ñ√§nekoski-Suolahti, <b>4</b> &raquo; V√§in√∂l√§, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Kaakkolampi, <b>18</b> &raquo; Ristikivi, <b>43</b> &raquo; Hankasalmi kk, <b>2</b> &raquo; Nojosniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Keskusta, <b>37</b> &raquo; Nuutti-Ruoke, <b>2</b> &raquo; Asmalampi-Kaunisharju, <b>42</b> &raquo; Vuontee--Lievestuore, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>25K</b> &raquo; Kaakkolampi, <b>22M</b> &raquo; Tikkakoski, <b>1312K</b> &raquo; Kauppatori, <b>43</b> &raquo; Lievestuore, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Vaajakoski, <b>12K</b> &raquo; Kauppatori (Palokangas), <b>13</b> &raquo; Viitaniemi, <b>27/28</b> &raquo; Tikkakoski
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Ainola%2321085.10464&amp;name_list=Ainola%201&amp;key=keskusta'>
+                 Ainola 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Kirri, <b>5</b> &raquo; Viitaniemi, <b>5</b> &raquo; Kauppatori, <b>5</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Kuokkala, <b>26</b> &raquo; Hein√§lampi
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Taulum%C3%A4k%232501.10292&amp;name_list=Taulum%C3%A4ki%201&amp;key=keskusta'>
+                 Taulum√§ki 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Keltinm√§ki, <b>33</b> &raquo; Keskusta, <b>36/27</b> &raquo; Mustalampi, <b>22</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22</b> &raquo; Viherlandia, <b>35</b> &raquo; Keskussairaala, <b>33</b> &raquo; Kuokkala, <b>34</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Keskusta, <b>35</b> &raquo; Keskusta, <b>28</b> &raquo; Keskusta, <b>31</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>26</b> &raquo; Keskusta, <b>36K</b> &raquo; Keskusta, <b>36</b> &raquo; Keskusta, <b>16</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Kirri, <b>39</b> &raquo; Keskusta, <b>26</b> &raquo; Ylist√∂nm√§ki, <b>27</b> &raquo; Kauppatori
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Niskakj%2321103.10500&amp;name_list=Niskakuja%201&amp;key=keskusta'>
+                 Niskakuja 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>12</b> &raquo; Keltinm√§ki, <b>32</b> &raquo; Keskusta, <b>12</b> &raquo; Myllyj√§rvi, <b>40</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Keskussairaala, <b>41</b> &raquo; Jyv√§skyl√§ keskussairaala, <b>37</b> &raquo; Ruoke-Nuutti, <b>41</b> &raquo; Jyv√§skyl√§ keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Keskusta, <b>12</b> &raquo; Helokantie, <b>41</b> &raquo; Jyv√§skyl√§ Keskussairaala, <b>40</b> &raquo; Jyv√§skyl√§, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>22M</b> &raquo; Keskusta, <b>12K</b> &raquo; Yl√§myllyj√§rvi, <b>41</b> &raquo; Jyv√§skyl√§ Keskusta, <b>12/13</b> &raquo; Muurame, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12/27</b> &raquo; Mustalampi, <b>12</b> &raquo; Keskussairaala, <b>22M</b> &raquo; Keskussairaala
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=J%C3%A4%C3%A4halli%2320942.10335&amp;name_list=J%C3%A4%C3%A4halli%202&amp;key=keskusta'>
+                 J√§√§halli 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Keltinm√§ki, <b>1</b> &raquo; Kortem√§ki, <b>15K</b> &raquo; Keskussairaala, <b>10</b> &raquo; Helokantie, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>36/27</b> &raquo; Mustalampi, <b>19</b> &raquo; Keskussairaala, <b>25</b> &raquo; Laajavuori, <b>41</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>35</b> &raquo; Keskussairaala, <b>25</b> &raquo; Haukkala, <b>16</b> &raquo; Keskussairaala, <b>2</b> &raquo; Kortem√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>3</b> &raquo; Keskussairaala, <b>2/25</b> &raquo; Kortem√§ki th, <b>10</b> &raquo; Keltinm√§ki, <b>13</b> &raquo; Tikkala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12K</b> &raquo; Keskusta, <b></b> &raquo; T√∂lsk√§n th, <b>4</b> &raquo; Keskussairaala, <b>37</b> &raquo; Ruoke-Nuutti, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>39</b> &raquo; Kuohu, <b>40</b> &raquo; Keskussairaala, <b>2</b> &raquo; Keskussairaala, <b>12K</b> &raquo; Yl√§myllyj√§rvi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>43</b> &raquo; Keskussairaala, <b>42</b> &raquo; Keskussairaala, <b>10</b> &raquo; Keskussairaala, <b>12/13</b> &raquo; Muurame, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12/27</b> &raquo; Mustalampi, <b>18</b> &raquo; Keskussairaala, <b>18</b> &raquo; Kortepohja, <b>22M</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b></b> &raquo; Lahjaharjun hautausmaa, <b>41</b> &raquo; Jyv√§skyl√§ Keskussairaala, <b>41</b> &raquo; Jyv√§skyl√§ keskussairaala, <b>12</b> &raquo; Keskussairaala
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Niskakj%2321103.10501&amp;name_list=Niskakuja%202&amp;key=keskusta'>
+                 Niskakuja 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>12</b> &raquo; Kangaslampi, <b>37</b> &raquo; Nuutti-Ruoke, <b>41</b> &raquo; Laukaa-Peurunka, <b>22M</b> &raquo; Tikkakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; √Ñ√§nekoski, <b>12K</b> &raquo; Kangaslampi, <b>40</b> &raquo; Suolahti, <b>32</b> &raquo; Vertaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Peurunka-√Ñ√§nekoski, <b>40</b> &raquo; √Ñ√§nekoski-Suolahti, <b>41</b> &raquo; Vihtavuori, <b>41</b> &raquo; Laukaa-√Ñ√§nekoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>36</b> &raquo; Tikkakoski, <b>12K</b> &raquo; Kauppatori (Palokangas), <b>1312K</b> &raquo; Kauppatori, <b>12K</b> &raquo; Palokangas
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Palokun%2321292.10837&amp;name_list=Palokunnankatu%202&amp;key=keskusta'>
+                 Palokunnankatu 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>18K</b> &raquo; Kortepohja, <b>18</b> &raquo; Kortepohja
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Oppilai%2321293.10838&amp;name_list=Oppilaitokset%202&amp;key=keskusta'>
+                 Oppilaitokset 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>18K</b> &raquo; Kortepohja, <b>18</b> &raquo; Kortepohja, <b>5</b> &raquo; Ylist√∂nm√§ki, <b>5</b> &raquo; Viitaniemi
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Taulum%C3%A4k%232501.10293&amp;name_list=Taulum%C3%A4ki%202&amp;key=keskusta'>
+                 Taulum√§ki 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Heikkil√§, <b>33</b> &raquo; Kirri, <b>36</b> &raquo; Tikkakoski, <b>22</b> &raquo; Tikkakoski, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>16</b> &raquo; Kirri, <b>33</b> &raquo; Keskusta, <b>22</b> &raquo; L√§nsiranta, <b>26</b> &raquo; Hein√§lampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>35</b> &raquo; Haukkam√§ki, <b>28</b> &raquo; Tikkakoski, <b>36K</b> &raquo; L√§nsiranta, <b>36</b> &raquo; L√§nsiranta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>26</b> &raquo; Jylh√§, <b>32</b> &raquo; Vertaala, <b>34</b> &raquo; Jylh√§, <b>31</b> &raquo; Vertaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>27/28</b> &raquo; Tikkakoski
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=KorpeJKL%2320845.10480&amp;name_list=Korpela%202&amp;key=keskusta'>
+                 Korpela 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>18K</b> &raquo; Nen√§inniemi, <b>19</b> &raquo; Samulinniemi, <b>20</b> &raquo; Kuokkala, <b>18</b> &raquo; Ristikivi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Kuokkala, <b>15K</b> &raquo; Viherlandia, <b>4</b> &raquo; V√§in√∂l√§
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Ylistm%C3%A4k%2321087.10470&amp;name_list=Ylist%C3%B6nm%C3%A4ki%201&amp;key=keskusta'>
+                 Ylist√∂nm√§ki 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>5</b> &raquo; Ylist√∂nm√§ki, <b>5</b> &raquo; Viitaniemi, <b>5</b> &raquo; Kauppatori, <b>5</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>26</b> &raquo; Ylist√∂nm√§ki, <b>26</b> &raquo; Hein√§lampi
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Jenkkakj%2322101.11535&amp;name_list=Jenkkakuja%201&amp;key=keskusta'>
+                 Jenkkakuja 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>33</b> &raquo; Kirri, <b>33</b> &raquo; Kuokkala
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Rautpohj%232495.10333&amp;name_list=Rautpohja%201&amp;key=keskusta'>
+                 Rautpohja 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Kaunisharju, <b>27</b> &raquo; Heikkil√§, <b>1</b> &raquo; Haapaniemi, <b>16</b> &raquo; Muuratsalo, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; √Ñ√§nekoski, <b>27</b> &raquo; Keskusta, <b>19</b> &raquo; Samulinniemi, <b>6</b> &raquo; Matkakeskus, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>3</b> &raquo; Vaajakoski, <b>41</b> &raquo; Peurunka-√Ñ√§nekoski, <b>13</b> &raquo; Kauppatori, <b>41</b> &raquo; Laukaa-Peurunka, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>15K</b> &raquo; Viherlandia, <b>3</b> &raquo; Asmalampi, <b>35</b> &raquo; Haukkam√§ki, <b>12K</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>41</b> &raquo; Laukaa-√Ñ√§nekoski, <b>25</b> &raquo; Kaakkolampi, <b>41</b> &raquo; Vihtavuori, <b>12K</b> &raquo; Kauppatori, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Kangaslampi, <b>40</b> &raquo; √Ñ√§nekoski, <b>40</b> &raquo; √Ñ√§nekoski-Suolahti, <b>4</b> &raquo; V√§in√∂l√§, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Kaakkolampi, <b>18</b> &raquo; Ristikivi, <b>43</b> &raquo; Hankasalmi kk, <b>2</b> &raquo; Nojosniemi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Keskusta, <b>37</b> &raquo; Nuutti-Ruoke, <b>2</b> &raquo; Asmalampi-Kaunisharju, <b>42</b> &raquo; Vuontee--Lievestuore, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>25K</b> &raquo; Kaakkolampi, <b>22M</b> &raquo; Tikkakoski, <b>1312K</b> &raquo; Kauppatori, <b>43</b> &raquo; Lievestuore, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Vaajakoski, <b>12K</b> &raquo; Kauppatori (Palokangas), <b>13</b> &raquo; Viitaniemi, <b>27/28</b> &raquo; Tikkakoski
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=N%2FA%2320838.10859&amp;name_list=Sepp%C3%A4l%C3%A4ntie%202&amp;key=keskusta'>
+                 Sepp√§l√§ntie 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>25</b> &raquo; Kaakkolampi, <b>25K</b> &raquo; Kaakkolampi, <b>20</b> &raquo; Pupuhuhta, <b>10</b> &raquo; Kangaslampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>10</b> &raquo; Kaakkolampi
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Aholaita%2320946.10355&amp;name_list=Aholaita%201&amp;key=keskusta'>
+                 Aholaita 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>1</b> &raquo; Kortem√§ki, <b>3</b> &raquo; Kirjasto, <b>2</b> &raquo; Kortem√§ki, <b>1</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>1</b> &raquo; Keskusta, <b>3</b> &raquo; Keskussairaala, <b>2/25</b> &raquo; Kortem√§ki th, <b>2</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b></b> &raquo; T√∂lsk√§n th, <b>4</b> &raquo; Keskussairaala, <b>2</b> &raquo; Keskusta, <b>43</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>43</b> &raquo; Keskussairaala, <b>42</b> &raquo; Keskussairaala, <b>38</b> &raquo; Cygnaeuksen koulu, <b></b> &raquo; Lahjaharjun hautausmaa, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>38K</b> &raquo; Keskusta
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Valimo%2320941.10330&amp;name_list=Valimo%201&amp;key=keskusta'>
+                 Valimo 1, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>2M</b> &raquo; Kaunisharju, <b>36/27</b> &raquo; Mustalampi, <b>13</b> &raquo; Tikkala, <b>12K</b> &raquo; Keskusta, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>37</b> &raquo; Nuutti-Ruoke, <b>41</b> &raquo; Vihtavuori, <b>12</b> &raquo; Myllyj√§rvi, <b>12</b> &raquo; Kangaslampi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12K</b> &raquo; Kauppatori (Palokangas), <b>12K</b> &raquo; Yl√§myllyj√§rvi
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Aholaita%2320946.10354&amp;name_list=Aholaita%202&amp;key=keskusta'>
+                 Aholaita 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>2</b> &raquo; Kaunisharju, <b>1</b> &raquo; Haapaniemi, <b>3</b> &raquo; Vaajakoski, <b>43</b> &raquo; Lievestuore, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>3</b> &raquo; Asmalampi, <b>2</b> &raquo; Vaajakoski, <b>2</b> &raquo; Asmalampi-Kaunisharju, <b>42</b> &raquo; Vuontee--Lievestuore, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>4</b> &raquo; V√§in√∂l√§, <b>38</b> &raquo; Ilmoniemi, <b>43</b> &raquo; Hankasalmi kk, <b>2</b> &raquo; Nojosniemi
+            </td>
+          <tr class='list_bg_color_dark'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Rautpohj%232495.10334&amp;name_list=Rautpohja%202&amp;key=keskusta'>
+                 Rautpohja 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>27</b> &raquo; Keltinm√§ki, <b>1</b> &raquo; Kortem√§ki, <b>15K</b> &raquo; Keskussairaala, <b>10</b> &raquo; Helokantie, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>36/27</b> &raquo; Mustalampi, <b>19</b> &raquo; Keskussairaala, <b>25</b> &raquo; Laajavuori, <b>41</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>35</b> &raquo; Keskussairaala, <b>25</b> &raquo; Haukkala, <b>16</b> &raquo; Keskussairaala, <b>2</b> &raquo; Kortem√§ki, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>3</b> &raquo; Keskussairaala, <b>2/25</b> &raquo; Kortem√§ki th, <b>10</b> &raquo; Keltinm√§ki, <b>13</b> &raquo; Tikkala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12K</b> &raquo; Keskusta, <b></b> &raquo; T√∂lsk√§n th, <b>4</b> &raquo; Keskussairaala, <b>37</b> &raquo; Ruoke-Nuutti, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>39</b> &raquo; Kuohu, <b>40</b> &raquo; Keskussairaala, <b>2</b> &raquo; Keskussairaala, <b>12K</b> &raquo; Yl√§myllyj√§rvi, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>43</b> &raquo; Keskussairaala, <b>42</b> &raquo; Keskussairaala, <b>10</b> &raquo; Keskussairaala, <b>12/13</b> &raquo; Muurame, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b>12/27</b> &raquo; Mustalampi, <b>18</b> &raquo; Keskussairaala, <b>18</b> &raquo; Kortepohja, <b>22M</b> &raquo; Keskussairaala, <br />&nbsp;&nbsp;&nbsp;&nbsp;<b></b> &raquo; Lahjaharjun hautausmaa, <b>41</b> &raquo; Jyv√§skyl√§ Keskussairaala, <b>41</b> &raquo; Jyv√§skyl√§ keskussairaala, <b>12</b> &raquo; Keskussairaala
+            </td>
+          <tr class='list_bg_color_light'>
+            <td>&nbsp;&nbsp;
+               <a href='?ua=search&amp;v=vm_stops&amp;stop_list=Palokunt%2321408.11094&amp;name_list=Palokunta%202&amp;key=keskusta'>
+                 Palokunta 2, Jyv‰skyl‰ (Keskusta,Jyv‰skyl‰)<br />
+               </a>
+                 &nbsp;&nbsp;&nbsp;&nbsp;<b>25</b> &raquo; Laajavuori, <b>25K</b> &raquo; Palokankeskus, <b>25</b> &raquo; Haukkala
+            </td>
+       </table>
+     </div><!-- End list location result box -->
+</div>
+<!-- End left column -->
+
+<!--
+Sitetracker check
+All OK!
+
+-->
+<div class='jkl_helper_footer'>&nbsp;</div><div class='jkl_footer'><a href='http://www.jyvaskylanliikenne.fi/'><div class='footer_link'>&nbsp;&nbsp;Jyv&auml;skyl&auml;n liikenteen etusivulle</div></a></div></div><!-- End main container -->
+<div class='powered_by'>Powered by Logica</div>
+
+    <!-- Start of StatCounter Code --> 
+    <script type="text/javascript"> 
+    <!--  
+    var sc_project=1963987;  
+    var sc_invisible=1;  
+    var sc_partition=17;  
+    var sc_security="32b31045";  
+    //--> 
+    </script>
+
+    <script type="text/javascript" src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div class="statcounter"><a class="statcounter" href="http://www.statcounter.com/"><img class="statcounter" src="http://c11.statcounter.com/counter.php?sc_project=1125616&amp;java=0&amp;security=2ee01afe&amp;invisible=1" alt="website page counter" /></a></div></noscript>
+
+    <!-- End of StatCounter Code -->
+    <!-- GUI host was mars --></body>
+</html>
